@@ -1,5 +1,6 @@
 from django.shortcuts import render
+from .forms import UserRegisterForm
 
-def logged_in(request):
-    return render(request,'layout/home.html')
+def register(request):
+    return render(request, 'users/register.html')
 

@@ -13,6 +13,7 @@
   </head>
 <body>
   <div class="navbar">
+    {% if user.is_authenticated %}
     <h2> User name + photo </h2>                  
     <ul>
         <li><a href="#">Home</a></li>
@@ -24,6 +25,17 @@
         <li><a href="2">Settings</a></li>
         <li><a href="2">Logout</a></li>
     </ul>
+    {% else %}
+    <div class="navbar">                 
+      <ul>
+          <li><a href="2">Log In</a></li>
+          <li><a href="{% url 'register' %}">Register</a></li>
+          <li><a href="2">Forgot A Password?</a></li>
+          <div><h1 class="small">Want to try a lab account? Contact me:</h1>
+          <li><a class="small" href="2"> jagabla8@gmail.com</a></li></div>
+      </ul>
+    </div>
+    {% endif %}      
   </div>          
   <main role="main" class="container">
     <div class="row">
@@ -35,9 +47,6 @@
             </div>
           {% endfor %}
         {% endif %}
-        <div class ="topnav">
-          <input type="text" placeholder="Search..">
-        </div>
         {% block content %}{% endblock %}
     </div>
 </main>
