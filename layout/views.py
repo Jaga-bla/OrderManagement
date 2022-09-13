@@ -6,3 +6,7 @@ def home(request):
 def about(request):
     return render(request,'layout/about.html')
 
+def ProductListView(ListView):
+    model = Product
+    template_name = 'products.html'
+
