@@ -1,0 +1,26 @@
+{% extends "layout/base_1.html" %}
+{% block content %}
+    <table>
+
+        <tr>
+        
+        <th>Product</th>
+        
+        <th>Contract</th>
+        
+        <th>Price</th>
+            
+        </tr>
+            {% for product in products %}
+                <tr>
+                
+                <td>{{ product.name }}</td>
+                
+                <td>{{ product.contract}}</td>
+                
+                <td>{{ product.price }}</td>
+            {% endfor %}  
+        </tr>
+            
+    </table>
+{% endblock content %}
