@@ -5,12 +5,9 @@
     <div class="centre">
         <form method="POST">
             {% csrf_token %}
-            <legend class="border-bottom" mb-4> Join Today </legend>
+            <legend class="border-bottom" mb-4> Log in </legend>
             {{ form|crispy }}
-            <button type="submit">Sign Up</button>
-            <small>
-                Already Have An Account? <a href="{% url 'login' %}">Sing In</a>
-            </small>
+            <button type="submit" >Sign Up</button>
         </form>
     </div>
 </div>
