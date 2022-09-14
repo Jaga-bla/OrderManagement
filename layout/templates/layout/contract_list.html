@@ -16,16 +16,17 @@
         <th>Price</th>
             
         </tr>
-            {% for product in products %}
+            {% for contract in contracts %}
                 <tr>
                 
-                <td> {{ product.id }} </td> 
+                <td> {{ contract.id }} </td> 
                 
-                <td>{{ product.contract}}</td>
+                <td>{{ contract.name}}</td>
+                <td>{% for product in contract.list_of_products %}
+                <div>{{ product }}</div>
+                {% endfor %}</td>
 
-                <td><a href="{% url 'product-detail' product.id %}" >{{ product.name }}</a></td>
-                
-                <td>{{ product.price }}</td>
+                <td>{{ contract.end_date}}</td>
             {% endfor %}  
         </tr>
             

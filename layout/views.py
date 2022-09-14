@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.views.generic import ListView, CreateView
+from django.shortcuts import render, get_list_or_404
+from django.views.generic import ListView, CreateView, DetailView
 from .models import Contract, Product
 
 def home(request):
@@ -12,6 +12,13 @@ class ProductListView(ListView):
     model = Product
     template_name = 'products.html'
     context_object_name = 'products'
+
+class ContractListView(ListView):
+    model = Contract
+    template_name = 'contracts.html'
+    context_object_name = 'contracts'
+
+
 
 class ContractCreateView(CreateView):
     model = Contract
@@ -34,6 +41,11 @@ class ProductCreateView(CreateView):
         'description', 
         'price',
         'vat',
-        'number_in_contract',
-        'author']
+        'number_in_contract']
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
+class ProductDetailView(DetailView):
+    model = Product
+    context_object_name = 'product'
