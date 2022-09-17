@@ -1,0 +1,42 @@
+{% extends "layout/base_1.html" %}
+{% block content %}
+<div class ="topnav">
+    <input type="text" placeholder="Search..">
+</div>
+    <table>
+
+        <tr>
+
+        <th>NO</th>
+
+        <th>Order</th>
+        
+        <th>Products</th>
+        
+        <th>Quantity</th>
+
+        <th>Is delivered</th>
+
+        <th>Edit</th>
+            
+        </tr>
+            {% for order in orders %}
+                <tr>
+                
+                <td>{{ order.id }}</td>
+                
+                <td>{{ order.contractor}}</td>
+
+                <td><a href="#">{{ order.product}}</a></td>
+                
+                <td>{{ order.quantity }}</td>
+
+                <td> {{ order.is_delivered }}</td>
+
+                <td><a href="{% url 'order-update' order.pk %}">link</a></td>
+
+            {% endfor %}  
+        </tr>
+            
+    </table>
+{% endblock content %}
