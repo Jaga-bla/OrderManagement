@@ -25,11 +25,10 @@
                 
                 <td>{{ contract.name}}</td>
 
-                <td>{% for product in contract.list_of_products %}
-                <div>
-                    <a href="{% url 'product-detail' product.id %}">{{ product }}</a>
-                </div>
-                {% endfor %}</td>
+                <td>{% for product in contract.display_products %}
+                    <div><a href="#">{{ product }}</a></div>
+                    {% endfor %} 
+                </td>
 
                 <td>{{ contract.start_date }}</td>
 

@@ -1,4 +1,5 @@
 from time import timezone
+from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
@@ -9,16 +10,30 @@ from django.core.validators import MaxValueValidator
 class Contractor(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    author = models.ForeignKey(User, null=True, on_delete = models.SET_NULL)
     def __str__(self):
         return self.name
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    catalog_number = models.CharField(max_length=100, default='0000')
+    impuls_number = models.CharField(max_length=100,default='0000')
+    producent = models.CharField(max_length=100)
+    description = models.TextField()
+    price = models.CharField(max_length=100)
+    vat = models.CharField(max_length=100,default='%')
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('product-detail', kwargs={'pk' : self.pk})
 
 class Contract(models.Model):
     name = models.CharField(max_length=100)
     contractor = models.ForeignKey(Contractor, null=True, on_delete=models.SET_NULL)
     start_date = models.DateField()
     end_date = models.DateField()
-    author = models.ForeignKey(User, null=True, on_delete = models.SET_NULL)
+    products = models.ManyToManyField(Product)
     PUBLIC_AUCTION = 'PUBLIC_AUCTION'
     QUICK_TENDER = 'QUICK_TENDER'
     type_choises = [
@@ -26,44 +41,40 @@ class Contract(models.Model):
         (QUICK_TENDER, 'Quick Tender')
     ]
     type = models.CharField(max_length=100, choices=type_choises)
-    def list_of_products(self):
-        return Product.objects.filter(contract=self)
-    def is_ending(self):
-        pass
-    def __str__(self):
-        return self.name
+    def display_products(self):
+        return [product.name for product in self.products.all()]
 
-class Product(models.Model):
-    name = models.CharField(max_length=100)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE)
-    catalog_number = models.CharField(max_length=100, default='0000')
-    index_number = models.CharField(max_length=100,default='0000')
-    description = models.TextField()
-    price = models.CharField(max_length=100)
-    vat = models.CharField(max_length=100,default='%')
-    number_in_contract = models.PositiveIntegerField(default=1)
-    author = models.ForeignKey(User,  null=True, on_delete = models.SET_NULL)
-    def __str__(self):
-        return self.name
+    def storage(self):
+        return Storage.objects.filter(contract = self.name)
 
     def get_absolute_url(self):
-        return reverse('product-detail', kwargs={'pk' : self.pk})
+        return reverse('contracts-list')
+
+    def __str__(self):
+        return self.name
 
 
-class Order(models.Model):
-    contractor = models.ForeignKey(Contractor, null=True, on_delete=models.SET_NULL)
+class Storage(models.Model):
     contract = models.ForeignKey(Contract, null=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    number_of_products = models.PositiveIntegerField(default=1)
+    def __str__(self):
+        return (self.contract.name + ' - ' + self.product.name)
+
+class Order(models.Model):
+    contract = models.ForeignKey(Storage, null=True, on_delete=models.SET_NULL)
     quantity = models.PositiveIntegerField()
     date_of_order = models.DateField(default=timezone.now)
+    is_ordered = models.BooleanField()
     is_delivered = models.BooleanField()
     def get_absolute_url(self):
         return reverse('orders-list')
     def save(self, *args, **kwargs):
-        if self.is_delivered == True:
+        if self.is_ordered == True and self.is_delivered == False:
             try:
-                update = Product.objects.get(name = self.product)
-                update.number_in_contract = update.number_in_contract - self.quantity
+                update = Storage.objects.filter(
+                    contract = self.contract.contract.id).filter(product = self.contract.product.id).first()
+                update.number_of_products = update.number_of_products - self.quantity
                 update.save()
             except:
                 return reverse('orders-list')

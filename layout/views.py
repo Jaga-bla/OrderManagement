@@ -1,13 +1,9 @@
 from django.shortcuts import render, get_list_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
-from .models import Contract, Order, Product
-from django.db.models import F
+from .models import Contract, Order, Product, Storage
 
 def home(request):
     return render(request,'layout/home.html')
-
-def about(request):
-    return render(request,'layout/about.html')
 
 class ProductListView(ListView):
     model = Product
@@ -24,14 +20,19 @@ class OrderListView(ListView):
     template_name = 'orders.html'
     context_object_name = 'orders'
 
+class StorageListView(ListView):
+    model = Storage
+    template_name = 'storage.html'
+    context_object_name = 'storage'
+
 class ContractCreateView(CreateView):
     model = Contract
     fields = [
         'name',
         'contractor',
         'start_date',
-        'end_date', 
-        'author', 
+        'end_date',
+        'products', 
         'type'
     ]
 
@@ -39,32 +40,29 @@ class ProductCreateView(CreateView):
     model = Product
     fields = [
         'name',
-        'contract',
         'catalog_number',
-        'index_number', 
-        'description', 
+        'producent', 
+        'description',
         'price',
-        'vat',
-        'number_in_contract']
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
+        'vat']
 
 class OrderCreateView(CreateView):
     model = Order
     fields = [
         'contract',
-        'contractor',
-        'product',
-        'quantity', 
-        'date_of_order', 
-        'is_delivered',
+        'quantity',
+        'date_of_order',
+        'is_ordered', 
+        'is_delivered'
         ]
 
 
 class OrderUpdateView(UpdateView):
     model = Order
-    fields = ['is_delivered']
+    fields = [
+        'is_ordered',
+        'is_delivered'
+    ]
 
     # def OrderComplete(self):
     #     if self.is_delivered == True:

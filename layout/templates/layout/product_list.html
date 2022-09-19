@@ -9,13 +9,15 @@
 
         <th>No</th>
 
-        <th>Contract</th>
-        
         <th>Product</th>
         
+        <th>Producent</th>
+        
+        <th>Catalog number</th>
+
         <th>Price</th>
 
-        <th>Number left to order</th>
+        <th>Vat</th>
             
         </tr>
             {% for product in products %}
@@ -23,13 +25,15 @@
                 
                 <td> {{ product.id }} </td> 
                 
-                <td>{{ product.contract}}</td>
-
                 <td><a href="{% url 'product-detail' product.id %}" >{{ product.name }}</a></td>
+
+                <td>{{ product.producent }}</td>
                 
+                <td>{{ product.catalog_number }}</td>
+
                 <td>{{ product.price }}</td>
 
-                <td>{{ product.number_in_contract }}</td>
+                <td>{{ product.vat }}</td>
 
                 <td><button type="button"><a href="{% url 'order-create' %}">Make An Order</a></button></td>
             {% endfor %}  

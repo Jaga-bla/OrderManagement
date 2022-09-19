@@ -11,13 +11,11 @@
 
         <th>Order</th>
         
-        <th>Products</th>
-        
         <th>Quantity</th>
 
-        <th>Is delivered</th>
+        <th>Is ordered</th>
 
-        <th>Edit</th>
+        <th>Is delivered</th>
             
         </tr>
             {% for order in orders %}
@@ -25,15 +23,15 @@
                 
                 <td>{{ order.id }}</td>
                 
-                <td>{{ order.contractor}}</td>
+                <td>{{ order.contract }}</td>
 
-                <td><a href="#">{{ order.product}}</a></td>
-                
                 <td>{{ order.quantity }}</td>
+                
+                <td>{{ order.is_ordered }}</td>
 
                 <td> {{ order.is_delivered }}</td>
 
-                <td><a href="{% url 'order-update' order.pk %}">link</a></td>
+                <td><a href="{% url 'order-update' order.id %}">link</a></td>
 
             {% endfor %}  
         </tr>
