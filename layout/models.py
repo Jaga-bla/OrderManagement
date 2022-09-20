@@ -1,11 +1,7 @@
 from time import timezone
-from tkinter import CASCADE
 from django.db import models
-from django.contrib.auth.models import User
-from datetime import date
 from django.urls import reverse
 from django.utils import timezone
-from django.core.validators import MaxValueValidator
 
 class Contractor(models.Model):
     name = models.CharField(max_length=100)

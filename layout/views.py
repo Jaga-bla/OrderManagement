@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from .models import Contract, Order, Product, Storage
 from django.contrib.auth.mixins import LoginRequiredMixin
