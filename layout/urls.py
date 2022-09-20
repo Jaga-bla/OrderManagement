@@ -8,8 +8,7 @@ from .views import (
     ContractListView, 
     OrderCreateView, 
     OrderUpdateView, 
-    OrderListView,
-    StorageListView
+    OrderListView
 )
 
 urlpatterns = [
@@ -18,7 +17,6 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name = 'products-list'),
     path('contracts/', ContractListView.as_view(), name = 'contracts-list'),
     path('orders/', OrderListView.as_view(), name = 'orders-list'),
-    path('storage/', StorageListView.as_view(), name = 'storage-list'),
     path('product/<int:pk>/', ProductDetailView.as_view(), name = 'product-detail'),
     path('products/create/', ProductCreateView.as_view(), name = 'products-create'),
     path('order/create/', OrderCreateView.as_view(), name = 'order-create'),

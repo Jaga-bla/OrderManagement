@@ -20,7 +20,6 @@ class Product(models.Model):
     vat = models.CharField(max_length=100,default='%')
     def __str__(self):
         return self.name
-
     def get_absolute_url(self):
         return reverse('product-detail', kwargs={'pk' : self.pk})
 
@@ -37,18 +36,24 @@ class Contract(models.Model):
         (QUICK_TENDER, 'Quick Tender')
     ]
     type = models.CharField(max_length=100, choices=type_choises)
-    def display_products(self):
-        return [product.name for product in self.products.all()]
-
-    def storage(self):
-        return Storage.objects.filter(contract = self.name)
-
     def get_absolute_url(self):
         return reverse('contracts-list')
-
     def __str__(self):
-        return self.name
+        return self.name  
 
+    def display_products(self): #return list of products related to specific contract
+        return [product.name for product in self.products.all()]
+
+    def display_products_id(self): #return list of products related to specific contract
+        return [product.id for product in self.products.all()]
+
+    def storage(self): #return stock status as a list, related to list od products
+        list_of_products = self.display_products_id()
+        storage_list = []
+        for p in list_of_products:
+            update = Storage.objects.filter(product=p).filter(contract=self).first()
+            storage_list.append(update.number_of_products)
+        return storage_list
 
 class Storage(models.Model):
     contract = models.ForeignKey(Contract, null=True, on_delete=models.SET_NULL)
