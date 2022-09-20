@@ -42,16 +42,13 @@ class Contract(models.Model):
         return self.name  
 
     def display_products(self): #return list of products related to specific contract
-        return [product.name for product in self.products.all()]
-
-    def display_products_id(self): #return list of products related to specific contract
-        return [product.id for product in self.products.all()]
+        return [product for product in self.products.all()]
 
     def storage(self): #return stock status as a list, related to list od products
-        list_of_products = self.display_products_id()
+        list_of_products = self.display_products()
         storage_list = []
         for p in list_of_products:
-            update = Storage.objects.filter(product=p).filter(contract=self).first()
+            update = Storage.objects.filter(product=p.id).filter(contract=self).first()
             storage_list.append(update.number_of_products)
         return storage_list
 

@@ -28,7 +28,7 @@
                 <td>{{ contract.name}}</td>
 
                 <td>{% for product in contract.display_products %}
-                    <div><a href="#">{{ product }}</a></div>
+                    <div><a href="{% url 'product-detail' product.id %}">{{ product }}</a></div>
                     {% endfor %} 
                 </td>
 
