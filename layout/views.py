@@ -22,10 +22,6 @@ class OrderListView(LoginRequiredMixin, ListView):
     template_name = 'orders.html'
     context_object_name = 'orders'
 
-class StorageListView(LoginRequiredMixin, ListView):
-    model = Storage
-    template_name = 'storage.html'
-    context_object_name = 'storage'
 
 class ContractCreateView(LoginRequiredMixin, CreateView):
     model = Contract
