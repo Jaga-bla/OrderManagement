@@ -1,31 +1,33 @@
 from django.shortcuts import render, get_list_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from .models import Contract, Order, Product, Storage
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 def home(request):
     return render(request,'layout/home.html')
 
-class ProductListView(ListView):
+
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'products.html'
     context_object_name = 'products'
 
-class ContractListView(ListView):
+class ContractListView(LoginRequiredMixin, ListView):
     model = Contract
     template_name = 'contracts.html'
     context_object_name = 'contracts'
 
-class OrderListView(ListView):
+class OrderListView(LoginRequiredMixin, ListView):
     model = Order
     template_name = 'orders.html'
     context_object_name = 'orders'
 
-class StorageListView(ListView):
+class StorageListView(LoginRequiredMixin, ListView):
     model = Storage
     template_name = 'storage.html'
     context_object_name = 'storage'
 
-class ContractCreateView(CreateView):
+class ContractCreateView(LoginRequiredMixin, CreateView):
     model = Contract
     fields = [
         'name',
@@ -36,7 +38,7 @@ class ContractCreateView(CreateView):
         'type'
     ]
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     fields = [
         'name',
@@ -46,7 +48,7 @@ class ProductCreateView(CreateView):
         'price',
         'vat']
 
-class OrderCreateView(CreateView):
+class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order
     fields = [
         'contract',
@@ -57,24 +59,15 @@ class OrderCreateView(CreateView):
         ]
 
 
-class OrderUpdateView(UpdateView):
+class OrderUpdateView(LoginRequiredMixin, UpdateView):
     model = Order
     fields = [
         'is_ordered',
         'is_delivered'
     ]
 
-    # def OrderComplete(self):
-    #     if self.is_delivered == True:
-    #         order = Order.objects.get(self)
-    #         for order_product in order.product.all():
-    #             order_product.number_in_contract -= order.quantity
-    #             order_product.save()
-    #         order.save()
 
 
-
-
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'
