@@ -8,6 +8,8 @@ class Contractor(models.Model):
     email = models.EmailField()
     def __str__(self):
         return self.name
+    def get_absolute_url(self):
+        return reverse('')
 
 
 class Product(models.Model):
@@ -37,7 +39,7 @@ class Contract(models.Model):
     ]
     type = models.CharField(max_length=100, choices=type_choises)
     def get_absolute_url(self):
-        return reverse('contracts-list')
+        return reverse('storage-create')
     def __str__(self):
         return self.name  
 
@@ -58,6 +60,8 @@ class Storage(models.Model):
     number_of_products = models.PositiveIntegerField(default=1)
     def __str__(self):
         return (self.contract.name + ' - ' + self.product.name)
+    def get_absolute_url(self):
+        return reverse('contracts-list')
 
 class Order(models.Model):
     contract = models.ForeignKey(Storage, null=True, on_delete=models.SET_NULL)

@@ -13,6 +13,8 @@
         
         <th>Quantity</th>
 
+        <th>Date Of Order</th>
+
         <th>Is ordered</th>
 
         <th>Is delivered</th>
@@ -26,12 +28,14 @@
                 <td>{{ order.contract }}</td>
 
                 <td>{{ order.quantity }}</td>
+
+                <td>{{ order.date_of_order }}</td>
                 
                 <td>{{ order.is_ordered }}</td>
 
                 <td> {{ order.is_delivered }}</td>
 
-                <td><a href="{% url 'order-update' order.id %}">link</a></td>
+                <td><a href="{% url 'order-update' order.id %}">Update Status</a></td>
 
             {% endfor %}  
         </tr>

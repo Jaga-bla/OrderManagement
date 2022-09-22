@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
-from .models import Contract, Order, Product, Storage
+from .models import Contract, Order, Product, Storage, Contractor
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 def home(request):
@@ -34,6 +34,21 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
         'type'
     ]
 
+class StorageCreateView(LoginRequiredMixin, CreateView):
+    model = Storage
+    fields = [
+        'contract',
+        'product',
+        'number_of_products'
+    ]
+
+class ContractorCreateView(LoginRequiredMixin, CreateView):
+    model = Contractor
+    fields = [
+        'name',
+        'email'
+    ]
+
 class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     fields = [
@@ -51,7 +66,8 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         'quantity',
         'date_of_order',
         'is_ordered', 
-        'is_delivered'
+        'is_delivered',
+        'date_of_order'
         ]
 
 
