@@ -19,6 +19,10 @@
         <th>Start Date</th>
 
         <th>End Date</th>
+
+        <th>User Responsible</th>
+
+        <th>Is Ending</th>
             
         </tr>
             {% for contract in contracts %}
@@ -38,9 +42,13 @@
                     {% endfor %} 
                 </td>
 
-                <td>{{ contract.start_date }}</td>
+                <td>{{ contract.start_date|date:"d-m-Y" }}</td>
 
-                <td>{{ contract.end_date }}</td>
+                <td>{{ contract.end_date|date:"d-m-Y" }}</td>
+
+                <td><a href="#">{{ contract.user_responsible }}</a></td>
+                
+                <td>{{ contract.ending }}</td>
 
             {% endfor %}  
         </tr>

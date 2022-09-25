@@ -2,6 +2,8 @@ from time import timezone
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from users.models import Profile
+from datetime import datetime, timedelta
 
 class Contractor(models.Model):
     name = models.CharField(max_length=100)
@@ -10,7 +12,6 @@ class Contractor(models.Model):
         return self.name
     def get_absolute_url(self):
         return reverse('')
-
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -28,6 +29,7 @@ class Product(models.Model):
 class Contract(models.Model):
     name = models.CharField(max_length=100)
     contractor = models.ForeignKey(Contractor, null=True, on_delete=models.SET_NULL)
+    user_responsible = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
     start_date = models.DateField()
     end_date = models.DateField()
     products = models.ManyToManyField(Product)
@@ -38,14 +40,13 @@ class Contract(models.Model):
         (QUICK_TENDER, 'Quick Tender')
     ]
     type = models.CharField(max_length=100, choices=type_choises)
+    ending = models.BooleanField(default=False)
     def get_absolute_url(self):
         return reverse('storage-create')
     def __str__(self):
         return self.name  
-
     def display_products(self): #return list of products related to specific contract
         return [product for product in self.products.all()]
-
     def storage(self): #return stock status as a list, related to list od products
         list_of_products = self.display_products()
         storage_list = []
@@ -53,6 +54,13 @@ class Contract(models.Model):
             update = Storage.objects.filter(product=p.id).filter(contract=self).first()
             storage_list.append(update.number_of_products)
         return storage_list
+    def is_ending(self):
+        x = self.end_date - timedelta(months=6)
+        y = datetime.now()
+        if y > x:
+            if self.type == 'PUBLIC_AUCTION':
+                self.ending = True
+                self.ending.save()
 
 class Storage(models.Model):
     contract = models.ForeignKey(Contract, null=True, on_delete=models.SET_NULL)
@@ -81,5 +89,3 @@ class Order(models.Model):
             except:
                 return reverse('orders-list')
         super().save(*args, **kwargs)
-
-

@@ -31,7 +31,8 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
         'start_date',
         'end_date',
         'products', 
-        'type'
+        'type',
+        'user_responsible'
     ]
 
 class StorageCreateView(LoginRequiredMixin, CreateView):
