@@ -1,8 +1,5 @@
 {% extends "layout/base_1.html" %}
 {% block content %}
-<div class ="topnav">
-    <input type="text" placeholder="Search..">
-    <a href="{% url 'contract-create' %}">Add Contract</a>
 </div>
     <table>
 
@@ -19,8 +16,6 @@
         <th>Start Date</th>
 
         <th>End Date</th>
-
-        <th>User Responsible</th>
 
         <th>Is Ending</th>
             
@@ -45,8 +40,6 @@
                 <td>{{ contract.start_date|date:"d-m-Y" }}</td>
 
                 <td>{{ contract.end_date|date:"d-m-Y" }}</td>
-
-                <td><a href="#">{{ contract.user_responsible }}</a></td>
                 
                 <td>{{ contract.ending }}</td>
 

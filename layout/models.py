@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from users.models import Profile
+from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 
 class Contractor(models.Model):
@@ -29,7 +30,7 @@ class Product(models.Model):
 class Contract(models.Model):
     name = models.CharField(max_length=100)
     contractor = models.ForeignKey(Contractor, null=True, on_delete=models.SET_NULL)
-    user_responsible = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
+    user_responsible = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     start_date = models.DateField()
     end_date = models.DateField()
     products = models.ManyToManyField(Product)
@@ -40,7 +41,6 @@ class Contract(models.Model):
         (QUICK_TENDER, 'Quick Tender')
     ]
     type = models.CharField(max_length=100, choices=type_choises)
-    ending = models.BooleanField(default=False)
     def get_absolute_url(self):
         return reverse('storage-create')
     def __str__(self):
@@ -54,13 +54,6 @@ class Contract(models.Model):
             update = Storage.objects.filter(product=p.id).filter(contract=self).first()
             storage_list.append(update.number_of_products)
         return storage_list
-    def is_ending(self):
-        x = self.end_date - timedelta(months=6)
-        y = datetime.now()
-        if y > x:
-            if self.type == 'PUBLIC_AUCTION':
-                self.ending = True
-                self.ending.save()
 
 class Storage(models.Model):
     contract = models.ForeignKey(Contract, null=True, on_delete=models.SET_NULL)

@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.contrib.auth.models import User
+from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -14,13 +16,22 @@ class ProductListView(LoginRequiredMixin, ListView):
 
 class ContractListView(LoginRequiredMixin, ListView):
     model = Contract
-    template_name = 'contracts.html'
+    template_name = 'layout/contracts.html'
     context_object_name = 'contracts'
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = Order
     template_name = 'orders.html'
     context_object_name = 'orders'
+
+class ContractEndListView(LoginRequiredMixin, ListView):
+    model = Contract
+    template_name = 'layout/contractend_list.html'
+    context_object_name = 'contracts'
+    def get_queryset(self):
+        user = User.objects.filter(username=self.request.user).first()
+        return Contract.objects.filter(user_responsible=user).filter(
+            type='PUBLIC_AUCTION').filter(end_date__lte=date.today()+timedelta(days=180))
 
 
 class ContractCreateView(LoginRequiredMixin, CreateView):

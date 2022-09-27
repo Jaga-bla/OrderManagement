@@ -1,0 +1,57 @@
+{% extends "layout/base_1.html" %}
+{% block content %}
+<div class ="topnav">
+    <input type="text" placeholder="Search..">
+    <a href="{% url 'contract-create' %}">Add Contract</a>
+</div>
+    <table>
+
+        <tr>
+
+        <th>No</th>
+
+        <th>Contract</th>
+        
+        <th>Products</th>
+
+        <th>Quantity</th>
+        
+        <th>Start Date</th>
+
+        <th>End Date</th>
+
+        <th>User Responsible</th>
+
+        <th>Type</th>
+            
+        </tr>
+            {% for contract in contracts %}
+                <tr>
+                
+                <td> {{ contract.id }} </td> 
+                
+                <td>{{ contract.name}}</td>
+
+                <td>{% for product in contract.display_products %}
+                    <div><a href="{% url 'product-detail' product.id %}">{{ product }}</a></div>
+                    {% endfor %} 
+                </td>
+
+                <td>{% for number in contract.storage %}
+                    <div>{{ number }}</div>
+                    {% endfor %} 
+                </td>
+
+                <td>{{ contract.start_date|date:"d-m-Y" }}</td>
+
+                <td>{{ contract.end_date|date:"d-m-Y" }}</td>
+
+                <td><a href="#">{{ contract.user_responsible }}</a></td>
+                
+                <td>{{ contract.type }}</td>
+
+            {% endfor %}  
+        </tr>
+            
+    </table>
+{% endblock content %}
