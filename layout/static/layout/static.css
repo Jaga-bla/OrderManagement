@@ -1,97 +1,60 @@
-table, th, td {
-
-  border: 1px solid black;
-  
-  border-collapse: collapse;
-  
-  }
-  
-  th, td {
-  
-  padding: 10px;
-  
-  }
-body {
-    background: #fafafa;
-    color: #333333;
-    margin-top: 5rem;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    color: #444444;
-  }
-  
-  ul {
-    margin: 0;
-  }
-  
-  .bg-steel {
-    background-color: #5f788a;
-  }
-  
-  .site-header .navbar-nav .nav-link {
-    color: #cbd5db;
-  }
-  
-  .site-header .navbar-nav .nav-link:hover {
-    color: #ffffff;
-  }
-  
-  .site-header .navbar-nav .nav-link.active {
-    font-weight: 500;
-  }
-  
-  .content-section {
-    background: #ffffff;
-    padding: 10px 20px;
-    border: 1px solid #dddddd;
-    border-radius: 3px;
-    margin-bottom: 20px;
-  }
-  
-  .article-title {
-    color: #444444;
-  }
-  
-  a.article-title:hover {
-    color: #428bca;
-    text-decoration: none;
-  }
-  
-  .article-content {
-    white-space: pre-line;
-  }
-  
-  .article-img {
-    height: 65px;
-    width: 65px;
-    margin-right: 16px;
-  }
-  
-  .article-metadata {
-    padding-bottom: 1px;
-    margin-bottom: 4px;
-    border-bottom: 1px solid #e3e3e3
-  }
-  
-  .article-metadata a:hover {
-    color: #333;
-    text-decoration: none;
-  }
-  
-  .article-svg {
-    width: 25px;
-    height: 25px;
+body{
+    background-color: white;
+}
+#logo{
+    display: inline-block;
     vertical-align: middle;
+    text-align: left;
+}
+.navbar {
+    top: 0;
+    width: 100%;
+    position:fixed;
+    overflow: hidden;
+    float: none;
+}
+.container-flow{
+  padding-left: 5%;
+  overflow: hidden;
+  display: inside;
+  top: 0;
+  width: 100%;
+}
+.navbar-collapse{
+  padding:1%
+}
+.navbar a {
+    float: left;
+    display: block;
+    color: black;
+    text-align: center;
+    padding-top: 10px;
+    padding-right: 20px;
+    text-decoration: none;
+    font-size: 17px;
   }
   
-  .account-img {
-    height: 125px;
-    width: 125px;
-    margin-right: 20px;
-    margin-bottom: 16px;
+  .navbar-nav a:hover {
+    color: black;
   }
   
-  .account-heading {
-    font-size: 2.5rem;
+  .navbar-nav a.active {
+    color: white;
+  }
+  .navbar-left-side{
+    position: left;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: left;
+  }
+  body {
+    padding-top: 80px;
+  }
+  @media (max-width: 979px) {
+    body {
+      padding-top: 0px;
+    }
+  }
+  .container{
+    padding-left: 5%;
   }

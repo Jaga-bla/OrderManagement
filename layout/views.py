@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     return render(request,'layout/home.html')
@@ -19,10 +20,25 @@ class ContractListView(LoginRequiredMixin, ListView):
     template_name = 'layout/contracts.html'
     context_object_name = 'contracts'
 
-class OrderListView(LoginRequiredMixin, ListView):
-    model = Order
-    template_name = 'orders.html'
-    context_object_name = 'orders'
+@login_required
+def OrderListView(response):
+    orders = Order.objects.all()
+    if response.method == "POST":
+        if response.POST.get("save"):
+            print(response.POST)
+            for order in orders:
+                if response.POST.get("o"+str(order.id)) == "is-ordered":
+                    order.is_ordered = True
+                else: 
+                    order.is_ordered = False
+                order.save()
+            for order in orders:
+                if response.POST.get("d"+str(order.id)) == "is-delivered":
+                    order.is_delivered = True
+                else: 
+                    order.is_delivered = False
+                order.save()
+    return render(response, "layout/order_list.html", {"orders": orders})
 
 class ContractEndListView(LoginRequiredMixin, ListView):
     model = Contract

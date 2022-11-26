@@ -1,4 +1,4 @@
-{% extends "layout/base_1.html" %}
+{% extends "layout/base.html" %}
 {% block content %}
 <div class ="topnav">
     <input type="text" placeholder="Search..">
@@ -36,7 +36,13 @@
 
                 <td>{{ product.vat }}</td>
 
-                <td><button type="button"><a href="{% url 'order-create' %}">Make An Order</a></button></td>
+                <td><button id="myButton" class="float-left submit-button" >Order</button>
+
+                    <script type="text/javascript">
+                        document.getElementById("myButton").onclick = function () {
+                            location.href = "{% url 'order-create' %}";
+                        };
+                    </script></td>
             {% endfor %}  
         </tr>
             
