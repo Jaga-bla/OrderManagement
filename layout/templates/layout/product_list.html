@@ -1,44 +1,36 @@
-{% extends "layout/base_1.html" %}
+{% extends "layout/base.html" %}
 {% block content %}
+</div>
 <div class ="topnav">
     <input type="text" placeholder="Search..">
     <a href="{% url 'product-create' %}">Add Product</a>
 </div>
-    <table>
-
-        <tr>
-
-        <th>No</th>
-
-        <th>Product</th>
-        
-        <th>Producent</th>
-        
-        <th>Catalog number</th>
-
-        <th>Price</th>
-
-        <th>Vat</th>
-            
-        </tr>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+            <th>No</th>
+            <th>Product</th>      
+            <th>Producent</th>
+            <th>Catalog number</th>
+            <th>Price</th>
+            <th>Vat</th>
+            </tr>
+        </thead>
             {% for product in products %}
                 <tr>
-                
                 <td> {{ product.id }} </td> 
-                
                 <td><a href="{% url 'product-detail' product.id %}" >{{ product.name }}</a></td>
-
                 <td>{{ product.producent }}</td>
-                
                 <td>{{ product.catalog_number }}</td>
-
                 <td>{{ product.price }}</td>
-
                 <td>{{ product.vat }}</td>
-
-                <td><button type="button"><a href="{% url 'order-create' %}">Make An Order</a></button></td>
+                <td><button id="myButton" class="float-left submit-button" >Order</button>
+                    <script type="text/javascript">
+                        document.getElementById("myButton").onclick = function () {
+                            location.href = "{% url 'order-create' %}";
+                        };
+                    </script></td>
             {% endfor %}  
         </tr>
-            
     </table>
 {% endblock content %}
