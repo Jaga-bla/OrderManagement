@@ -8,7 +8,6 @@ from .views import (
     ContractListView, 
     OrderCreateView, 
     OrderUpdateView, 
-    OrderListView,
     StorageCreateView,
     ContractorCreateView,
     ContractEndListView
@@ -20,7 +19,7 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name = 'products-list'),
     path('contracts/', ContractListView.as_view(), name = 'contracts-list'),
     path('contracts/end', ContractEndListView.as_view(), name = 'contracts-end'),
-    path('orders/', OrderListView.as_view(), name = 'orders-list'),
+    path('orders/', views.OrderListView, name = 'orders-list'),
     path('product/<int:pk>/', ProductDetailView.as_view(), name = 'product-detail'),
     path('products/create/', ProductCreateView.as_view(), name = 'product-create'),
     path('contractor/create/', ContractorCreateView.as_view(), name = 'contractor-create'),
