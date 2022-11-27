@@ -1,25 +1,18 @@
 {% extends "layout/base.html" %}
 {% block content %}
 </div>
-    <table>
-
-        <tr>
-
-        <th>No</th>
-
-        <th>Contract</th>
-        
-        <th>Products</th>
-
-        <th>Quantity</th>
-        
-        <th>Start Date</th>
-
-        <th>End Date</th>
-
-        <th>Is Ending</th>
-            
-        </tr>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+            <th>No</th>
+            <th>Contract</th>
+            <th>Products</th>
+            <th>Quantity</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Is Ending</th>
+            </tr>
+        </thead>
             {% for contract in contracts %}
                 <tr>
                 
