@@ -1,61 +1,15 @@
-body{
-    background-color: white;
+nav .navbar-nav li a{
+  color: rgb(0, 0, 0) !important;
 }
-#logo{
-    display: inline-block;
-    vertical-align: middle;
-    text-align: left;
-}
-.navbar {
-    top: 0;
-    width: 100%;
-    position:fixed;
-    overflow: hidden;
-    float: none;
-}
-.container-flow{
-  padding-left: 5%;
-  overflow: hidden;
-  display: inside;
-  top: 0;
-  width: 100%;
-}
-.navbar-collapse{
-  padding:1%
-}
-.navbar a {
-    float: left;
-    display: block;
-    color: black;
-    text-align: center;
-    padding-top: 10px;
-    padding-right: 20px;
-    text-decoration: none;
-    font-size: 17px;
-  }
-  
-  .navbar-nav a:hover {
-    color: black;
-  }
-  
-  .navbar-nav a.active {
-    color: white;
-  }
-  .navbar-left-side{
-    position: left;
-    display: inline-block;
-    vertical-align: middle;
-    text-align: left;
-  }
-  body {
-    padding-top: 80px;
-  }
-  @media (max-width: 979px) {
-    body {
-      padding-top: 0px;
-    }
-  }
-  .container{
-    padding-left: 5%;
-  }
 
+a{
+  color: rgb(0, 0, 0) !important;
+}
+
+nav .container-fluid{
+  padding-right: 5%;
+}
+
+#logo{
+  padding-right: 10%;
+}
