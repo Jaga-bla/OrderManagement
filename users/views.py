@@ -17,8 +17,9 @@ def register(request):
 @login_required
 def profile(request):
     if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST)
-        profile_form = ProfileUpdateForm(request.POST)
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user)
         if profile_form.is_valid() and user_form.is_valid():
             user_form.save()
             profile_form.save()
