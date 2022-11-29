@@ -32,8 +32,8 @@ class Contract(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     products = models.ManyToManyField(Product)
-    PUBLIC_AUCTION = 'PUBLIC_AUCTION'
-    QUICK_TENDER = 'QUICK_TENDER'
+    PUBLIC_AUCTION = 'Public Auction'
+    QUICK_TENDER = 'Quick Tender'
     type_choises = [
         (PUBLIC_AUCTION, 'Public Auction'), 
         (QUICK_TENDER, 'Quick Tender')
