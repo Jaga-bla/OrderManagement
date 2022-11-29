@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.models import User
 from datetime import date, timedelta
@@ -9,11 +10,15 @@ from django.contrib.auth.decorators import login_required
 def home(request):
     return render(request,'layout/home.html')
 
-
-class ProductListView(LoginRequiredMixin, ListView):
-    model = Product
-    template_name = 'products.html'
-    context_object_name = 'products'
+@login_required
+def ProductListView(response):
+    products = Product.objects.all()
+    if response.method == "POST":
+        for product in products:
+            if response.POST.get("myButton"+str(product.id)):
+                print(response.POST)
+                return redirect(reverse('order-create'))
+    return render(response, "layout/product_list.html", {"products": products})
 
 class ContractListView(LoginRequiredMixin, ListView):
     model = Contract
@@ -48,7 +53,6 @@ class ContractEndListView(LoginRequiredMixin, ListView):
         user = User.objects.filter(username=self.request.user).first()
         return Contract.objects.filter(user_responsible=user).filter(
             type='PUBLIC_AUCTION').filter(end_date__lte=date.today()+timedelta(days=180))
-
 
 class ContractCreateView(LoginRequiredMixin, CreateView):
     model = Contract
@@ -98,15 +102,12 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         'date_of_order'
         ]
 
-
 class OrderUpdateView(LoginRequiredMixin, UpdateView):
     model = Order
     fields = [
         'is_ordered',
         'is_delivered'
     ]
-
-
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product

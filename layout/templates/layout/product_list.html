@@ -24,12 +24,10 @@
                 <td>{{ product.catalog_number }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.vat }}</td>
-                <td><button id="myButton" class="float-left submit-button" >Order</button>
-                    <script type="text/javascript">
-                        document.getElementById("myButton").onclick = function () {
-                            location.href = "{% url 'order-create' %}";
-                        };
-                    </script></td>
+                <form method="post">
+                    {% csrf_token %}
+                    <td><button name="myButton{{product.id}}" class="float-left submit-button" type="submit" value="clicked">Order</button>
+                </form>
             {% endfor %}  
         </tr>
     </table>
