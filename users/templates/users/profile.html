@@ -6,12 +6,18 @@
        {% csrf_token %}
        <fieldset class="form-group">
             <legend class="border-bottom" mb-4> Profile Info </legend>
+            <div>
+                Your username: {{ user_info.username }}
+            </div>
+            <div>
+                Your email: {{ user_info.email }}
+            </div>
+            <div>
+                <button class="btn btn-secondary">Update your email</button>
+            </div>   
+            <img src="{{ user.profile.image.url }}" alt="account-photo" height="53" width="53"/>
             {{ profile_form|crispy }}
-            {{ user_form|crispy }}
        </fieldset>
-       <div class="form-group">
-            <button class="btn btn-outline-info" type="submit">Update</button>
-        </div>
     </form>
 </div>
 {% endblock content %}

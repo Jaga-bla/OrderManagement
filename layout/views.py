@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView,FormView
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
+from .forms import ProductForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
@@ -81,15 +82,9 @@ class ContractorCreateView(LoginRequiredMixin, CreateView):
         'email'
     ]
 
-class ProductCreateView(LoginRequiredMixin, CreateView):
-    model = Product
-    fields = [
-        'name',
-        'catalog_number',
-        'producent', 
-        'description',
-        'price',
-        'vat']
+class ProductCreateView(LoginRequiredMixin, FormView):
+    form_class = ProductForm
+    template_name = 'layout/product_form.html'
 
 class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order

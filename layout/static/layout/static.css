@@ -13,3 +13,7 @@ nav .container-fluid{
 #logo{
   padding-right: 10%;
 }
+
+.container{
+  font-size: 20px;
+}

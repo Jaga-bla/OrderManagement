@@ -104,7 +104,7 @@
     </div>
   </nav>
 <hr>
-  <main role="main" class="container">
+  <main role="main" class="container-fluid">
     <div class="row">
       <div class="col-md-8">
         {% if messages %}
@@ -114,9 +114,10 @@
             </div>
           {% endfor %}
         {% endif %}
-        {% block content %}{% endblock %}
       </div>
     </div>
+    
+    {% block content %}{% endblock %}
   </main>
 </body>
 </html>
