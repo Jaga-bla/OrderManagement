@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import ListView, CreateView, DetailView, UpdateView,FormView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView,FormView,View
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
 from .forms import ProductForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+
+class CompanyUserMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.profile.company == 'None':
+            return redirect('users-create-company')
+        return super().dispatch(request, *args, **kwargs)
 
 def home(request):
     return render(request,'layout/home.html')
@@ -43,7 +49,7 @@ def OrderListView(response):
                 order.save()
     return render(response, "layout/order_list.html", {"orders": orders})
 
-class ContractEndListView(LoginRequiredMixin, ListView):
+class ContractEndListView(CompanyUserMixin,LoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contractend_list.html'
     context_object_name = 'contracts'

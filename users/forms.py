@@ -35,13 +35,13 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['email']
 
-class ProfileUpdateForm(forms.Form):
+class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['image']
 
 
-class CompanyCreateForm(forms.Form):
+class CompanyCreateForm(forms.ModelForm):
     name = forms.CharField(label="Enter your company name")
     password = forms.CharField(label="Enter your company password")
     class Meta:

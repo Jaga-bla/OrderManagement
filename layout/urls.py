@@ -1,4 +1,5 @@
 from django.urls import path
+from users import views as users_views
 from . import views
 from .views import (
     ProductCreateView, 

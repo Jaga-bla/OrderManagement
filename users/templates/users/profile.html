@@ -13,10 +13,14 @@
                 Your email: {{ user_info.email }}
             </div>
             <div>
+                Your company: {{ user_info.profile.company.name }}
+            </div>
+            <div>
                 <button class="btn btn-secondary">Update your email</button>
             </div>   
             <img src="{{ user.profile.image.url }}" alt="account-photo" height="53" width="53"/>
             {{ profile_form|crispy }}
+            <button class="btn btn-secondary" type = "submit">Update</button>
        </fieldset>
     </form>
 </div>
