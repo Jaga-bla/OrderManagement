@@ -31,14 +31,11 @@ def OrderListView(response):
     orders = Order.objects.all()
     if response.method == "POST":
         if response.POST.get("save"):
-            print(response.POST)
             for order in orders:
                 if response.POST.get("o"+str(order.id)) == "is-ordered":
                     order.is_ordered = True
                 else: 
                     order.is_ordered = False
-                order.save()
-            for order in orders:
                 if response.POST.get("d"+str(order.id)) == "is-delivered":
                     order.is_delivered = True
                 else: 
@@ -66,6 +63,9 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
         'type',
         'user_responsible'
     ]
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 class StorageCreateView(LoginRequiredMixin, CreateView):
     model = Storage
@@ -81,10 +81,17 @@ class ContractorCreateView(LoginRequiredMixin, CreateView):
         'name',
         'email'
     ]
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 class ProductCreateView(LoginRequiredMixin, FormView):
     form_class = ProductForm
     template_name = 'layout/product_form.html'
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order
@@ -96,6 +103,9 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         'is_delivered',
         'date_of_order'
         ]
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 class OrderUpdateView(LoginRequiredMixin, UpdateView):
     model = Order

@@ -14,7 +14,7 @@ from .views import (
 
 urlpatterns = [
     path('home/', views.home, name = 'home'),
-    path('', views.home, name = 'home'),
+    path('', views.home),
     path('products/', views.ProductListView, name = 'products-list'),
     path('contracts/', ContractListView.as_view(), name = 'contracts-list'),
     path('contracts/end', ContractEndListView.as_view(), name = 'contracts-end'),

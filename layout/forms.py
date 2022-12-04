@@ -1,4 +1,5 @@
 from django import forms
+from .models import Product
 
 class ProductForm(forms.Form):
     name = forms.CharField(label='Your name', max_length=100)
@@ -8,3 +9,6 @@ class ProductForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea)
     price = forms.CharField(max_length=100)
     vat = forms.CharField(max_length=100)
+    class Meta:
+        model = Product
+        fields = ['name','catalog_number','impuls_number','producent', 'description', 'price', 'vat']

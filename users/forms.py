@@ -1,10 +1,19 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Profile
 from django.forms import ValidationError
+from layout.models import Company
 
 
 class UserRegisterForm(UserCreationForm):
+    email = forms.EmailField(label=('Email'),
+        help_text=('Required. Enter an existing email address.'))
+    CHOICES = (
+        ('Yes','Yes'),
+        ('No','No')
+    )
+    new_company = forms.ChoiceField(choices = CHOICES)
     class Meta:
         model = User
         fields = ['first_name','last_name','username','password1', 'password2', 'email']
@@ -27,4 +36,14 @@ class UserUpdateForm(forms.ModelForm):
         fields = ['email']
 
 class ProfileUpdateForm(forms.Form):
-    image = forms.FileInput()
+    class Meta:
+        model = Profile
+        fields = ['image']
+
+
+class CompanyCreateForm(forms.Form):
+    name = forms.CharField(label="Enter your company name")
+    password = forms.CharField(label="Enter your company password")
+    class Meta:
+        model = Company
+        fields = ['name', 'password']

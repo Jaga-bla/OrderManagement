@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
+from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm, CompanyCreateForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import FormView, View
 from django.contrib.auth.models import User
@@ -18,20 +18,43 @@ class UserRegisterView(GuestOnlyView,FormView):
 
     def form_valid(self, form):
         request = self.request
-        user = form.save(commit=False)
-        user.username = form.cleaned_data['username']
-        user.save()
-        raw_password = form.cleaned_data['password1']
-        user = authenticate(username=user.username, password=raw_password)
-        login(request, user)
-        messages.success(request, ('You are successfully signed up!'))
-        return redirect('home')
+        # # user = form.save(commit=False)
+        # user.username = form.cleaned_data['username']
+        # # user.save()
+        # raw_password = form.cleaned_data['password1']
+        # user = authenticate(username=user.username, password=raw_password)
+        # login(request, user)
+        if request.POST.get('new_company') == 'No':
+            print(request.POST.get('new_company'))
+            messages.success(request, ('You are successfully signed up! Now create your company.'))
+            return redirect('login-company')
+        if request.POST.get('new_company') == 'Yes':
+            print(request.POST.get('new_company'))
+            messages.success(request, ('You are successfully signed up! Now login to your company.'))
+            return redirect('create-company')
+
+def createCompanyView(request):
+    user = request.user
+    form = CompanyCreateForm
+    context = {
+        'user' : user,
+        'form' : form
+    }
+    return render(request, 'users/create-company.html', context)
+
+def loginCompanyView(request):
+    user = request.user
+    context = {
+        user :'user'
+    }
+    return render(request, 'users/login-company.html', context)
+
 
 @login_required
 def profile(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST)
-        profile_form = ProfileUpdateForm()
+        profile_form = ProfileUpdateForm(request.POST)
         if profile_form.is_valid() and user_form.is_valid():
             user_form.save()
             profile_form.save()
