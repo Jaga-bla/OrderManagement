@@ -14,10 +14,13 @@ from django.contrib.auth.decorators import user_passes_test
 def staff_required(login_url=None):
     return user_passes_test(lambda u: u.profile.company, login_url=login_url)
 
-class CompanyRequiredMixin(View):
+class CompanyAndLoginRequiredMixin(View):
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.profile.company:
-            messages.info(request, "You Have to login or create company first!")
+        if not request.user.is_authenticated:
+            messages.info(request, "You Have to login or create account first.")
+            return redirect('login')
+        elif not request.user.profile.company:
+            messages.info(request, "You Have to login or create company first.")
             return redirect('create-company')
         return super().dispatch(request, *args, **kwargs)
 
@@ -34,7 +37,7 @@ def ProductListView(response):
                 return redirect(reverse('order-create'))
     return render(response, "layout/product_list.html", {"products": products})
 
-class ContractListView(CompanyRequiredMixin,LoginRequiredMixin, ListView):
+class ContractListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contracts.html'
     context_object_name = 'contracts'
@@ -56,7 +59,7 @@ def OrderListView(response):
                 order.save()
     return render(response, "layout/order_list.html", {"orders": orders})
 
-class ContractEndListView(CompanyRequiredMixin,LoginRequiredMixin, ListView):
+class ContractEndListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contractend_list.html'
     context_object_name = 'contracts'
@@ -65,7 +68,7 @@ class ContractEndListView(CompanyRequiredMixin,LoginRequiredMixin, ListView):
         return Contract.objects.filter(user_responsible=user).filter(
             type='PUBLIC_AUCTION').filter(end_date__lte=date.today()+timedelta(days=180))
 
-class ContractCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
+class ContractCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contract
     fields = [
         'name',
@@ -80,7 +83,7 @@ class ContractCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class StorageCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
+class StorageCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Storage
     fields = [
         'contract',
@@ -88,7 +91,7 @@ class StorageCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
         'number_of_products'
     ]
 
-class ContractorCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
+class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contractor
     fields = [
         'name',
@@ -98,7 +101,7 @@ class ContractorCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class ProductCreateView(CompanyRequiredMixin,LoginRequiredMixin, FormView):
+class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
     form_class = ProductForm
     template_name = 'layout/product_form.html'
     
@@ -106,7 +109,7 @@ class ProductCreateView(CompanyRequiredMixin,LoginRequiredMixin, FormView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class OrderCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
+class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Order
     fields = [
         'contract',
@@ -120,6 +123,6 @@ class OrderCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class ProductDetailView(CompanyRequiredMixin,LoginRequiredMixin, DetailView):
+class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'

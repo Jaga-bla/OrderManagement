@@ -25,8 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('layout.urls'), name = 'home'),
     path('register/', UserRegisterView.as_view(), name='register'),
-    path('create_company', CreateCompanyView.as_view(), name='create-company'),
-    path('login_company/', user_views.LoginCompanyView, name='login-company'),
+    path('create/company/', CreateCompanyView.as_view(), name='create-company'),
+    path('login/company/', user_views.LoginCompanyView, name='login-company'),
     path('profile/', user_views.profile, name='profile'),
     path('login/', auth_views.LoginView.as_view(template_name = 'users/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name = 'users/logout.html'), name='logout')
