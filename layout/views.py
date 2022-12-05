@@ -5,13 +5,20 @@ from django.contrib.auth.models import User
 from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
 from .forms import ProductForm
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 
-class CompanyUserMixin(View):
+
+def staff_required(login_url=None):
+    return user_passes_test(lambda u: u.profile.company, login_url=login_url)
+
+class CompanyRequiredMixin(View):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.profile.company == 'None':
-            return redirect('users-create-company')
+        if not request.user.profile.company:
+            messages.info(request, "You Have to login or create company first!")
+            return redirect('create-company')
         return super().dispatch(request, *args, **kwargs)
 
 def home(request):
@@ -27,7 +34,7 @@ def ProductListView(response):
                 return redirect(reverse('order-create'))
     return render(response, "layout/product_list.html", {"products": products})
 
-class ContractListView(LoginRequiredMixin, ListView):
+class ContractListView(CompanyRequiredMixin,LoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contracts.html'
     context_object_name = 'contracts'
@@ -49,7 +56,7 @@ def OrderListView(response):
                 order.save()
     return render(response, "layout/order_list.html", {"orders": orders})
 
-class ContractEndListView(CompanyUserMixin,LoginRequiredMixin, ListView):
+class ContractEndListView(CompanyRequiredMixin,LoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contractend_list.html'
     context_object_name = 'contracts'
@@ -58,7 +65,7 @@ class ContractEndListView(CompanyUserMixin,LoginRequiredMixin, ListView):
         return Contract.objects.filter(user_responsible=user).filter(
             type='PUBLIC_AUCTION').filter(end_date__lte=date.today()+timedelta(days=180))
 
-class ContractCreateView(LoginRequiredMixin, CreateView):
+class ContractCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
     model = Contract
     fields = [
         'name',
@@ -73,7 +80,7 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class StorageCreateView(LoginRequiredMixin, CreateView):
+class StorageCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
     model = Storage
     fields = [
         'contract',
@@ -81,7 +88,7 @@ class StorageCreateView(LoginRequiredMixin, CreateView):
         'number_of_products'
     ]
 
-class ContractorCreateView(LoginRequiredMixin, CreateView):
+class ContractorCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
     model = Contractor
     fields = [
         'name',
@@ -91,7 +98,7 @@ class ContractorCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class ProductCreateView(LoginRequiredMixin, FormView):
+class ProductCreateView(CompanyRequiredMixin,LoginRequiredMixin, FormView):
     form_class = ProductForm
     template_name = 'layout/product_form.html'
     
@@ -99,7 +106,7 @@ class ProductCreateView(LoginRequiredMixin, FormView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class OrderCreateView(LoginRequiredMixin, CreateView):
+class OrderCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
     model = Order
     fields = [
         'contract',
@@ -113,13 +120,13 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class OrderUpdateView(LoginRequiredMixin, UpdateView):
+class OrderUpdateView(CompanyRequiredMixin,LoginRequiredMixin, UpdateView):
     model = Order
     fields = [
         'is_ordered',
         'is_delivered'
     ]
 
-class ProductDetailView(LoginRequiredMixin, DetailView):
+class ProductDetailView(CompanyRequiredMixin,LoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'

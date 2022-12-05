@@ -42,7 +42,7 @@ class CreateCompanyView(FormView):
         profile.company = form.instance
         form.instance.save()
         profile.save()
-        return redirect('create-company') 
+        return redirect('home') 
 
 def LoginCompanyView(request):
     user = request.user

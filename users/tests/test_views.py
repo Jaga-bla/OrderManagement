@@ -9,7 +9,8 @@ class TestView(TestCase):
         self.client = Client()
         self.register_url = reverse('register')
         self.profile_url = reverse('profile')
-
+        self.create_company_url = reverse('create-company')
+        self.login_company_url = reverse('login-company')
 
     def test_UserRegisterView(self):
         response = self.client.get(self.register_url)
@@ -18,3 +19,20 @@ class TestView(TestCase):
 
     def test_post_UserRegisterView(self):
         pass
+
+    def test_CreateCompanyView(self):
+        response = self.client.get(self.create_company_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/create-company.html')
+
+    def test_CreateCompanyView(self):
+        response = self.client.get(self.login_company_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/login-company.html')
+
+        
+    def test_CreateCompanyView(self):
+        #something wrong here
+        response = self.client.get(self.profile_url)
+        self.assertEquals(response.status_code, 302)
+        self.assertTemplateUsed(response, 'users/profile.html')
