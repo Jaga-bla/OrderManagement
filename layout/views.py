@@ -120,13 +120,6 @@ class OrderCreateView(CompanyRequiredMixin,LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class OrderUpdateView(CompanyRequiredMixin,LoginRequiredMixin, UpdateView):
-    model = Order
-    fields = [
-        'is_ordered',
-        'is_delivered'
-    ]
-
 class ProductDetailView(CompanyRequiredMixin,LoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'
