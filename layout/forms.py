@@ -1,7 +1,7 @@
 from django import forms
 from .models import Product
 
-class ProductForm(forms.Form):
+class ProductForm(forms.ModelForm):
     name = forms.CharField(label='Your name', max_length=100)
     catalog_number = forms.CharField(label = 'Catalog Number',max_length=100)
     impuls_number = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'special'}))

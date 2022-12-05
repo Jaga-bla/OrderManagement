@@ -2,6 +2,7 @@ from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 from layout import views
 from layout.views import (
+    ProductListView,
     ProductCreateView, 
     ContractCreateView, 
     ProductDetailView, 
@@ -15,7 +16,7 @@ class TestUrls(SimpleTestCase):
     
     def test_products_list_url(self):
         url = reverse('products-list')
-        self.assertEquals(resolve(url).func, views.ProductListView)
+        self.assertEquals(resolve(url).func.view_class, ProductListView)
 
     def test_product_detail_url(self):
         url = reverse('product-detail')
