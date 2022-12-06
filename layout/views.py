@@ -61,26 +61,16 @@ class OrderListView(CompanyAndLoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Order.objects.filter(author__profile__company = self.request.user.profile.company)
         return queryset
-    def post(self, *args, **kwargs):
-        orders = Order.objects.all()
-        for order in orders:
-            if self.request.POST.get("o"+str(order.id)) == "is-ordered":
-                print(order,order.is_ordered, self.request.POST.get("o"+str(order.id)))
-                order.is_ordered = True
-                print(order.is_ordered)
-            else:
-                print(order,order.is_ordered, self.request.POST.get("o"+str(order.id)))
-                order.is_ordered = False
-                print(order.is_ordered)   
-            if self.request.POST.get("d"+str(order.id)) == "is-delivered":
-                print(order, order.is_delivered, self.request.POST.get("d"+str(order.id)))
-                order.is_delivered = True
-                print(order.is_delivered)
-            else:
-                print(order, order.is_delivered, self.request.POST.get("d"+str(order.id)))
-                order.is_delivered = False
-                print(order.is_delivered)
-            order.save()
+    def post(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        ID_list_ordered = request.POST.getlist('is_ordered')
+        ID_list_delivered = request.POST.getlist('is_delivered')
+        queryset.update(is_ordered = False)
+        queryset.update(is_delivered = False)
+        for x in ID_list_ordered:
+            Order.objects.filter(pk = int(x)).update(is_ordered = True)
+        for x in ID_list_delivered:
+            Order.objects.filter(pk = int(x)).update(is_delivered = True)
         return redirect('orders-list')
         
 

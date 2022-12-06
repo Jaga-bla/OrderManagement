@@ -73,8 +73,8 @@ class Order(models.Model):
     contract = models.ForeignKey(Storage, null=True, on_delete=models.SET_NULL)
     quantity = models.PositiveIntegerField()
     date_of_order = models.DateField(default=timezone.now)
-    is_ordered = models.BooleanField()
-    is_delivered = models.BooleanField()
+    is_ordered = models.BooleanField('Is ordered', default = False)
+    is_delivered = models.BooleanField('Is Ordered', default = False)
     author = models.ForeignKey(User, null=True, on_delete = models.SET_NULL)
     def get_absolute_url(self):
         return reverse('orders-list')
