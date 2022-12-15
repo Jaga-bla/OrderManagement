@@ -27,7 +27,6 @@ class UserRegisterForm(UserCreationForm):
 
         return email
 
-
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
 
@@ -44,6 +43,13 @@ class ProfileUpdateForm(forms.ModelForm):
 class CompanyCreateForm(forms.ModelForm):
     name = forms.CharField(label="Enter your company name")
     password = forms.CharField(label="Enter your company password")
+    class Meta:
+        model = Company
+        fields = ['name', 'password']
+
+class CompanyLoginForm(forms.Form):
+    name = forms.CharField()
+    password = forms.CharField(label="Enter your company's key")
     class Meta:
         model = Company
         fields = ['name', 'password']

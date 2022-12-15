@@ -34,7 +34,6 @@ class ProductListView(CompanyAndLoginRequiredMixin, ListView):
                 print(self.request.POST)
                 return redirect(reverse('order-create'))
 
-
 class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
     form_class = ProductForm
     template_name = 'layout/product_form.html'
@@ -126,6 +125,11 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'is_delivered',
         'date_of_order'
         ]
+    # def get_form_class(self):
+    #     modelform = super().get_form_class()
+    #     modelform.base_fields['contract'].limit_choices_to = {'company': self.kwargs['company']}
+    #     return modelform
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
