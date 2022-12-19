@@ -93,6 +93,13 @@ class ContractCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'type',
         'user_responsible'
     ]
+    def get_form_class(self):
+        user_company = self.request.user.profile.company
+        modelform = super().get_form_class()
+        modelform.base_fields['products'].queryset = Product.objects.filter(author__profile__company = user_company)
+        modelform.base_fields['contractor'].queryset = Contractor.objects.filter(author__profile__company = user_company)
+        modelform.base_fields['user_responsible'].queryset = User.objects.filter(profile__company = user_company)        
+        return modelform
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -104,6 +111,12 @@ class StorageCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'product',
         'number_of_products'
     ]
+    def get_form_class(self):
+        user_company = self.request.user.profile.company
+        modelform = super().get_form_class()
+        modelform.base_fields['product'].queryset = Product.objects.filter(author__profile__company = user_company)
+        modelform.base_fields['contract'].queryset = Contract.objects.filter(author__profile__company = user_company)
+        return modelform
 
 class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contractor
@@ -111,6 +124,7 @@ class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'name',
         'email'
     ]
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -125,10 +139,11 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'is_delivered',
         'date_of_order'
         ]
-    # def get_form_class(self):
-    #     modelform = super().get_form_class()
-    #     modelform.base_fields['contract'].limit_choices_to = {'company': self.kwargs['company']}
-    #     return modelform
+    
+    def get_form_class(self):
+        modelform = super().get_form_class()
+        modelform.base_fields['contract'].queryset = Contract.objects.filter(author__profile__company = self.request.user.profile.company)
+        return modelform
 
     def form_valid(self, form):
         form.instance.author = self.request.user

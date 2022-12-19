@@ -25,13 +25,13 @@ class TestView(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'users/create-company.html')
 
-    def test_CreateCompanyView(self):
+    def test_LoginCompanyView(self):
         response = self.client.get(self.login_company_url)
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'users/login-company.html')
 
         
-    def test_CreateCompanyView(self):
+    def test_profileView(self):
         #something wrong here
         response = self.client.get(self.profile_url)
         self.assertEquals(response.status_code, 302)
