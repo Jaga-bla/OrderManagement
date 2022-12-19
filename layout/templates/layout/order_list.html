@@ -42,6 +42,9 @@
                         <input type="checkbox" name="is_delivered" value="{{order.id}}" >
                     </td>
                     {% endif %}
+                    <td>
+                    <a href =  "{% url 'object-delete' order.id %}">Delete</a>
+                    </td>
                 {% endfor %}  
             </tr>
         </table>

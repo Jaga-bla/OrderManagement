@@ -5,7 +5,6 @@ from .models import Profile
 from django.forms import ValidationError
 from layout.models import Company
 
-
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(label=('Email'),
         help_text=('Required. Enter an existing email address.'))

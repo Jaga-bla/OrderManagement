@@ -26,7 +26,7 @@
                 <td>{{ product.vat }}</td>
                 <form method="post">
                     {% csrf_token %}
-                    <td><button name="myButton{{product.id}}" class="float-left submit-button" type="submit" value="clicked">Order</button>
+                    <td><button name="myButton{{product.name}}" class="float-left submit-button" type="submit" value="clicked">Order</button>
                 </form>
             {% endfor %}  
         </tr>

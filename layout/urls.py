@@ -10,7 +10,8 @@ from .views import (
     OrderCreateView,  
     StorageCreateView,
     ContractorCreateView,
-    ContractEndListView
+    ContractEndListView,
+    ObjectDeleteView
 )
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
     path('order/create/', OrderCreateView.as_view(), name = 'order-create'),
     path('contractor/create/', ContractorCreateView.as_view(), name = 'contractor-create'),
     path('storage/create/', StorageCreateView.as_view(), name = 'storage-create'),
+    path('object/delete/<int:pk>/', ObjectDeleteView.as_view(), name = 'object-delete'),
 ]

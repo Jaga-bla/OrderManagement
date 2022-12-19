@@ -43,6 +43,7 @@
                 
                 <td>{{ contract.type }}</td>
 
+                <td><a href =  "{% url 'object-delete' contract.id %}">Delete</a></td>
             {% endfor %}  
         </tr>
             

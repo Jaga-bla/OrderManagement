@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import ListView, CreateView, DetailView,FormView,View
+from django.views.generic import ListView, CreateView, DetailView,FormView,View, DeleteView
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
@@ -30,15 +30,15 @@ class ProductListView(CompanyAndLoginRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         products = Product.objects.filter()
         for product in products:
-            if self.request.POST.get("myButton"+str(product.id)):
-                print(self.request.POST)
-                return redirect(reverse('order-create'))
+            if self.request.POST.get("myButton"+str(product.name)):
+                name = product.name
+                return redirect('/order/create/?name=' + name)
 
 class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
     form_class = ProductForm
     template_name = 'layout/product_form.html'
     success_url = "/products/"
-    
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.save()
@@ -142,7 +142,14 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
     
     def get_form_class(self):
         modelform = super().get_form_class()
-        modelform.base_fields['contract'].queryset = Contract.objects.filter(author__profile__company = self.request.user.profile.company)
+        product_name = self.request.GET.get('name')
+        if product_name is not None:
+            modelform.base_fields['contract'].queryset = Contract.objects.filter(
+                author__profile__company = self.request.user.profile.company).filter(
+                products__name = product_name)
+        else:
+            modelform.base_fields['contract'].queryset = Contract.objects.filter(
+                author__profile__company = self.request.user.profile.company)
         return modelform
 
     def form_valid(self, form):
@@ -152,3 +159,19 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
 class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'
+
+class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+    model = Product
+    success_url ="/" 
+    template_name = "layout/object_delete.html"
+
+class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+    model = Order
+    success_url ="/" 
+    template_name = "layout/object_delete.html"
+
+class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+    model = Contract
+    success_url ="/" 
+    template_name = "layout/object_delete.html"
+
