@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from users.models import Profile
+from users.forms import ProfileUpdateForm, UserUpdateForm
 from django.contrib.auth.models import User
 
 class TestView(TestCase):
@@ -11,6 +12,7 @@ class TestView(TestCase):
         self.profile_url = reverse('profile')
         self.create_company_url = reverse('create-company')
         self.login_company_url = reverse('login-company')
+
 
     def test_UserRegisterView(self):
         response = self.client.get(self.register_url)
@@ -30,9 +32,7 @@ class TestView(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'users/login-company.html')
 
-        
     def test_profileView(self):
-        #something wrong here
-        response = self.client.get(self.profile_url)
+        response = self.client.get(self.profile_url, {'user_info':user_info})
         self.assertEquals(response.status_code, 302)
         self.assertTemplateUsed(response, 'users/profile.html')

@@ -18,9 +18,9 @@ class TestUrls(SimpleTestCase):
         url = reverse('products-list')
         self.assertEquals(resolve(url).func.view_class, ProductListView)
 
-    # def test_product_detail_url(self):
-    #     url = reverse('product-detail')
-    #     self.assertEquals(resolve(url).func.view_class, ProductDetailView)
+    def test_product_detail_url(self):
+        url = reverse('product-detail', args = ['1'])
+        self.assertEquals(resolve(url).func.view_class, ProductDetailView)
     
     def test_product_create_url(self):
         url = reverse('product-create')
