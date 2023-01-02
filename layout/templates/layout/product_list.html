@@ -51,14 +51,16 @@
               txtValue1 = td_first.textContent || td_first.innerText;
               txtValue2 = td_second.textContent || td_first.innerText;
               txtValue3 = td_third.textContent || td_first.innerText;
-              if (txtValue1.toUpperCase().indexOf(filter_product) > -1) {
-                tr[i].style.display = "";
-              } else {
-                tr[i].style.display = "none";
-              }
-            }          
-          }
+              if (txtValue1.toUpperCase().indexOf(filter_product) > -1 && 
+                txtValue2.toUpperCase().indexOf(filter_producer) > -1  && 
+                txtValue3.toUpperCase().indexOf(filter_catNo) > -1) {
+            tr[i].style.display = "";
+            } else {
+            tr[i].style.display = "none";
+            }
+          }          
         }
+      }
       </script>
 {% endblock content %}
     
