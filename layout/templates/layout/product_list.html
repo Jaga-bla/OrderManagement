@@ -2,15 +2,16 @@
 {% block content %}
 </div>
 <form class="d-flex" role="search">
-    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-    <button class="btn btn-outline-success" type="submit">Search</button>
+  <input class="form-control me-2" type="search" placeholder="Search by product name" id="myInputProduct" onkeyup="filter()">
+  <input class="form-control me-2" type="search" placeholder="Search by producer" id="myInputProducer" onkeyup="filter()">
+  <input class="form-control me-2" type="search" placeholder="Search by catalog number" id="myInputCatNo" onkeyup="filter()">
 </form>
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="myTable">
         <thead>
             <tr>
             <th>No</th>
             <th>Product</th>      
-            <th>Producent</th>
+            <th>Producer</th>
             <th>Catalog number</th>
             <th>Price</th>
             <th>Vat</th>
@@ -20,7 +21,7 @@
                 <tr>
                 <td> {{ product.id }} </td> 
                 <td><a href="{% url 'product-detail' product.id %}" >{{ product.name }}</a></td>
-                <td>{{ product.producent }}</td>
+                <td>{{ product.producer }}</td>
                 <td>{{ product.catalog_number }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.vat }}</td>
@@ -31,4 +32,33 @@
             {% endfor %}  
         </tr>
     </table>
+    <script>
+        function filter() {
+          var input, filter, table, tr, td, i, txtValue;
+          input_product = document.getElementById("myInputProduct");
+          filter_product = input_product.value.toUpperCase();
+          input_producer = document.getElementById("myInputProducer");
+          filter_producer = input_producer.value.toUpperCase();
+          input_catNo = document.getElementById("myInputCatNo");
+          filter_catNo = input_catNo.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+          for (i = 0; i < tr.length; i++) {
+            td_first = tr[i].getElementsByTagName("td")[1];
+            td_second = tr[i].getElementsByTagName("td")[2];
+            td_third = tr[i].getElementsByTagName("td")[3];
+            if (td_first || td_second || td_third) {
+              txtValue1 = td_first.textContent || td_first.innerText;
+              txtValue2 = td_second.textContent || td_first.innerText;
+              txtValue3 = td_third.textContent || td_first.innerText;
+              if (txtValue1.toUpperCase().indexOf(filter_product) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }          
+          }
+        }
+      </script>
 {% endblock content %}
+    

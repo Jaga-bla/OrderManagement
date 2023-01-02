@@ -7,7 +7,6 @@ from datetime import date, timedelta
 from django.core.mail import send_mail
 from django.conf import settings
 
-
 class Company(models.Model):
     name = models.CharField(max_length=100)
     password = models.CharField(max_length=100,default='0000')
@@ -25,7 +24,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     catalog_number = models.CharField(max_length=100, default='0000')
     impuls_number = models.CharField(max_length=100,default='0000')
-    producent = models.CharField(max_length=100)
+    producer = models.CharField(max_length=100)
     description = models.TextField()
     price = models.CharField(max_length=100)
     vat = models.CharField(max_length=100,default='%')
