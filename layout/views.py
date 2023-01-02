@@ -1,56 +1,91 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.views.generic import ListView, CreateView, DetailView,FormView,View, DeleteView
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 from .models import Contract, Order, Product, Storage, Contractor
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
+from .forms import ProductForm
+from django.contrib import messages
 
 def home(request):
     return render(request,'layout/home.html')
 
+class CompanyAndLoginRequiredMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.info(request, "You Have to login or create account first.")
+            return redirect('login')
+        elif not request.user.profile.company:
+            messages.info(request, "You Have to login or create company first.")
+            return redirect('create-company')
+        return super().dispatch(request, *args, **kwargs)
 
-class ProductListView(LoginRequiredMixin, ListView):
+class ProductListView(CompanyAndLoginRequiredMixin, ListView):
     model = Product
-    template_name = 'products.html'
+    template_name = 'layout/product_list.html'
     context_object_name = 'products'
+    def get_queryset(self):
+        queryset = Product.objects.filter(author__profile__company = self.request.user.profile.company)
+        return queryset
+    def post(self, request, *args, **kwargs):
+        products = Product.objects.filter()
+        for product in products:
+            if self.request.POST.get("myButton"+str(product.name)):
+                name = product.name
+                return redirect('/order/create/?name=' + name)
 
-class ContractListView(LoginRequiredMixin, ListView):
+class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
+    form_class = ProductForm
+    template_name = 'layout/product_form.html'
+    success_url = "/products/"
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.save()
+        return super().form_valid(form)
+
+
+class ContractListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contracts.html'
     context_object_name = 'contracts'
+    def get_queryset(self):
+        queryset = Contract.objects.filter(author__profile__company = self.request.user.profile.company)
+        return queryset
 
-@login_required
-def OrderListView(response):
-    orders = Order.objects.all()
-    if response.method == "POST":
-        if response.POST.get("save"):
-            print(response.POST)
-            for order in orders:
-                if response.POST.get("o"+str(order.id)) == "is-ordered":
-                    order.is_ordered = True
-                else: 
-                    order.is_ordered = False
-                order.save()
-            for order in orders:
-                if response.POST.get("d"+str(order.id)) == "is-delivered":
-                    order.is_delivered = True
-                else: 
-                    order.is_delivered = False
-                order.save()
-    return render(response, "layout/order_list.html", {"orders": orders})
-
-class ContractEndListView(LoginRequiredMixin, ListView):
+class OrderListView(CompanyAndLoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'layout/order_list.html'
+    context_object_name = 'orders'
+    def get_queryset(self):
+        queryset = Order.objects.filter(author__profile__company = self.request.user.profile.company)
+        return queryset
+    def post(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        ID_list_ordered = request.POST.getlist('is_ordered')
+        ID_list_delivered = request.POST.getlist('is_delivered')
+        queryset.update(is_ordered = False)
+        queryset.update(is_delivered = False)
+        for x in ID_list_ordered:
+            Order.objects.filter(pk = int(x)).update(is_ordered = True)
+        for x in ID_list_delivered:
+            Order.objects.filter(pk = int(x)).update(is_delivered = True)
+        return redirect('orders-list')
+        
+class ContractEndListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contractend_list.html'
     context_object_name = 'contracts'
     def get_queryset(self):
         user = User.objects.filter(username=self.request.user).first()
-        return Contract.objects.filter(user_responsible=user).filter(
-            type='PUBLIC_AUCTION').filter(end_date__lte=date.today()+timedelta(days=180))
+        objects =  Contract.objects.filter(user_responsible=user).filter(
+            type='Public Auction').filter(
+                end_date__lte=date.today()+timedelta(days=180)).filter(
+                    end_date__gte=date.today())
+        for object in objects:
+            object.sendMailIfContractEnding()
+        return objects
 
-
-class ContractCreateView(LoginRequiredMixin, CreateView):
+class ContractCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contract
     fields = [
         'name',
@@ -61,33 +96,42 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
         'type',
         'user_responsible'
     ]
+    def get_form_class(self):
+        user_company = self.request.user.profile.company
+        modelform = super().get_form_class()
+        modelform.base_fields['products'].queryset = Product.objects.filter(author__profile__company = user_company)
+        modelform.base_fields['contractor'].queryset = Contractor.objects.filter(author__profile__company = user_company)
+        modelform.base_fields['user_responsible'].queryset = User.objects.filter(profile__company = user_company)        
+        return modelform
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-class StorageCreateView(LoginRequiredMixin, CreateView):
+class StorageCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Storage
     fields = [
         'contract',
         'product',
         'number_of_products'
     ]
+    def get_form_class(self):
+        user_company = self.request.user.profile.company
+        modelform = super().get_form_class()
+        modelform.base_fields['product'].queryset = Product.objects.filter(author__profile__company = user_company)
+        modelform.base_fields['contract'].queryset = Contract.objects.filter(author__profile__company = user_company)
+        return modelform
 
-class ContractorCreateView(LoginRequiredMixin, CreateView):
+class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contractor
     fields = [
         'name',
         'email'
     ]
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-class ProductCreateView(LoginRequiredMixin, CreateView):
-    model = Product
-    fields = [
-        'name',
-        'catalog_number',
-        'producent', 
-        'description',
-        'price',
-        'vat']
-
-class OrderCreateView(LoginRequiredMixin, CreateView):
+class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Order
     fields = [
         'contract',
@@ -97,17 +141,36 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         'is_delivered',
         'date_of_order'
         ]
+    def get_form_class(self):
+        modelform = super().get_form_class()
+        product_name = self.request.GET.get('name')
+        if product_name is not None:
+            modelform.base_fields['contract'].queryset = Contract.objects.filter(
+                author__profile__company = self.request.user.profile.company).filter(
+                products__name = product_name)
+        else:
+            modelform.base_fields['contract'].queryset = Contract.objects.filter(
+                author__profile__company = self.request.user.profile.company)
+        return modelform
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-
-class OrderUpdateView(LoginRequiredMixin, UpdateView):
-    model = Order
-    fields = [
-        'is_ordered',
-        'is_delivered'
-    ]
-
-
-
-class ProductDetailView(LoginRequiredMixin, DetailView):
+class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'
+
+class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+    model = Product
+    success_url ="/" 
+    template_name = "layout/object_delete.html"
+
+class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+    model = Order
+    success_url ="/" 
+    template_name = "layout/object_delete.html"
+
+class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+    model = Contract
+    success_url ="/" 
+    template_name = "layout/object_delete.html"
