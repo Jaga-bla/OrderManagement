@@ -38,7 +38,6 @@ class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
     form_class = ProductForm
     template_name = 'layout/product_form.html'
     success_url = "/products/"
-
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.save()
@@ -72,15 +71,19 @@ class OrderListView(CompanyAndLoginRequiredMixin, ListView):
             Order.objects.filter(pk = int(x)).update(is_delivered = True)
         return redirect('orders-list')
         
-
 class ContractEndListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
     template_name = 'layout/contractend_list.html'
     context_object_name = 'contracts'
     def get_queryset(self):
         user = User.objects.filter(username=self.request.user).first()
-        return Contract.objects.filter(user_responsible=user).filter(
-            type='PUBLIC_AUCTION').filter(end_date__lte=date.today()+timedelta(days=180))
+        objects =  Contract.objects.filter(user_responsible=user).filter(
+            type='Public Auction').filter(
+                end_date__lte=date.today()+timedelta(days=180)).filter(
+                    end_date__gte=date.today())
+        for object in objects:
+            object.sendMailIfContractEnding()
+        return objects
 
 class ContractCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contract
@@ -124,7 +127,6 @@ class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'name',
         'email'
     ]
-
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -139,7 +141,6 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
         'is_delivered',
         'date_of_order'
         ]
-    
     def get_form_class(self):
         modelform = super().get_form_class()
         product_name = self.request.GET.get('name')
@@ -151,7 +152,6 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
             modelform.base_fields['contract'].queryset = Contract.objects.filter(
                 author__profile__company = self.request.user.profile.company)
         return modelform
-
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -174,4 +174,3 @@ class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
     model = Contract
     success_url ="/" 
     template_name = "layout/object_delete.html"
-
