@@ -1,16 +1,17 @@
 {% extends "layout/base.html" %}
 {% block content %}
 </div>
-<div class ="topnav">
-    <input type="text" placeholder="Search..">
-    <a href="{% url 'product-create' %}">Add Product</a>
-</div>
-    <table class="table table-striped table-hover">
+<form class="d-flex" role="search">
+  <input class="form-control me-2" type="search" placeholder="Search by product name" id="myInputProduct" onkeyup="filter()">
+  <input class="form-control me-2" type="search" placeholder="Search by producer" id="myInputProducer" onkeyup="filter()">
+  <input class="form-control me-2" type="search" placeholder="Search by catalog number" id="myInputCatNo" onkeyup="filter()">
+</form>
+    <table class="table table-striped table-hover" id="myTable">
         <thead>
             <tr>
             <th>No</th>
             <th>Product</th>      
-            <th>Producent</th>
+            <th>Producer</th>
             <th>Catalog number</th>
             <th>Price</th>
             <th>Vat</th>
@@ -20,17 +21,44 @@
                 <tr>
                 <td> {{ product.id }} </td> 
                 <td><a href="{% url 'product-detail' product.id %}" >{{ product.name }}</a></td>
-                <td>{{ product.producent }}</td>
+                <td>{{ product.producer }}</td>
                 <td>{{ product.catalog_number }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.vat }}</td>
-                <td><button id="myButton" class="float-left submit-button" >Order</button>
-                    <script type="text/javascript">
-                        document.getElementById("myButton").onclick = function () {
-                            location.href = "{% url 'order-create' %}";
-                        };
-                    </script></td>
+                <form method="post">
+                    {% csrf_token %}
+                    <td><button name="myButton{{product.name}}" class="float-left submit-button" type="submit" value="clicked">Order</button>
+                </form>
             {% endfor %}  
         </tr>
     </table>
+    <script>
+        function filter() {
+          var input, filter, table, tr, td, i, txtValue;
+          input_product = document.getElementById("myInputProduct");
+          filter_product = input_product.value.toUpperCase();
+          input_producer = document.getElementById("myInputProducer");
+          filter_producer = input_producer.value.toUpperCase();
+          input_catNo = document.getElementById("myInputCatNo");
+          filter_catNo = input_catNo.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+          for (i = 0; i < tr.length; i++) {
+            td_first = tr[i].getElementsByTagName("td")[1];
+            td_second = tr[i].getElementsByTagName("td")[2];
+            td_third = tr[i].getElementsByTagName("td")[3];
+            if (td_first || td_second || td_third) {
+              txtValue1 = td_first.textContent || td_first.innerText;
+              txtValue2 = td_second.textContent || td_first.innerText;
+              txtValue3 = td_third.textContent || td_first.innerText;
+              if (txtValue1.toUpperCase().indexOf(filter_product) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }          
+          }
+        }
+      </script>
 {% endblock content %}
+    

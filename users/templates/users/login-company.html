@@ -1,0 +1,30 @@
+{% extends "layout/base.html" %}
+{% block content %}
+<div class="container">
+    <div class="centre">
+        <legend class="border-bottom" mb-4> Login to Your Company </legend>
+        <div class="container">
+            <div class="centre">
+                <form method="post">
+                    {% csrf_token %}
+                    <div>
+                        Enter your company name
+                        <div>
+                            {{ form.name }}
+                        </div>
+                    </div>
+                    <div>
+                        Enter your company key
+                        <div>
+                            {{ form.password }}
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" type = "submit">Sign Up</button>
+                </form>
+            </div>
+        </div>
+        If your company doesn't have an account
+        <a href="{% url 'create-company' %}">Create A Company</a>
+    </div>
+</div>
+{% endblock content %}

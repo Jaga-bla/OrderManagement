@@ -8,6 +8,9 @@ django = "*"
 django-crispy-forms = "*"
 windows-curses = "*"
 django-extra-views = "*"
+pillow = "*"
+django-environ = "*"
+celery = "*"
 
 [dev-packages]
 
