@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product
+from .models import Product, Order,Contract
 
 class ProductForm(forms.ModelForm):
     name = forms.CharField(label='Product name', max_length=100)
@@ -12,3 +12,13 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name','catalog_number','impuls_number','producent', 'description', 'price', 'vat']
+
+class OrderForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user','')
+        super(OrderForm, self).__init__(*args, **kwargs)
+        self.fields['products'] = forms.ModelChoiceField(
+            queryset=Product.objects.filter(author__company= user.company))
+        self.fields['contract'] = forms.ModelChoiceField(
+            queryset=Contract.objects.filter(author__company= user.company))
+    

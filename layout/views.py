@@ -160,17 +160,17 @@ class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product
     context_object_name = 'product'
 
-class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+class ProductDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
     model = Product
     success_url ="/" 
     template_name = "layout/object_delete.html"
 
-class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+class OrderDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
     model = Order
     success_url ="/" 
     template_name = "layout/object_delete.html"
 
-class ObjectDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
+class ContractDeleteView(CompanyAndLoginRequiredMixin, DeleteView):
     model = Contract
     success_url ="/" 
     template_name = "layout/object_delete.html"
