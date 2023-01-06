@@ -84,5 +84,4 @@ def profile(request):
         'user_info' : user_info,
         'profile_form' : profile_form
     }
-    print(render(request, 'users/profile.html', context))
     return render(request, 'users/profile.html', context)

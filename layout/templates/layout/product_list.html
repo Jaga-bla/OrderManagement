@@ -9,7 +9,6 @@
     <table class="table table-striped table-hover" id="myTable">
         <thead>
             <tr>
-            <th>No</th>
             <th>Product</th>      
             <th>Producer</th>
             <th>Catalog number</th>
@@ -19,7 +18,6 @@
         </thead>
             {% for product in products %}
                 <tr>
-                <td> {{ product.id }} </td> 
                 <td><a href="{% url 'product-detail' product.id %}" >{{ product.name }}</a></td>
                 <td>{{ product.producer }}</td>
                 <td>{{ product.catalog_number }}</td>
@@ -44,9 +42,9 @@
           table = document.getElementById("myTable");
           tr = table.getElementsByTagName("tr");
           for (i = 0; i < tr.length; i++) {
-            td_first = tr[i].getElementsByTagName("td")[1];
-            td_second = tr[i].getElementsByTagName("td")[2];
-            td_third = tr[i].getElementsByTagName("td")[3];
+            td_first = tr[i].getElementsByTagName("td")[0];
+            td_second = tr[i].getElementsByTagName("td")[1];
+            td_third = tr[i].getElementsByTagName("td")[2];
             if (td_first || td_second || td_third) {
               txtValue1 = td_first.textContent || td_first.innerText;
               txtValue2 = td_second.textContent || td_first.innerText;

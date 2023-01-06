@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% block content %}
 <h2 class="article-title">{{ object.name }}</h2>
-<a href =  "{% url 'object-delete' product.id %}">Delete</a>
+<a href =  "#">Edit</a>
+<a href =  "{% url 'product-delete' product.id %}">Delete</a>
 <p class="article-content">{{ object.description }}</p>
 {% endblock content %}

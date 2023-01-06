@@ -22,7 +22,11 @@
                     <tr>   
                     <td>{{ order.id }}</td>
                     <td>{{ order.contract }}</td>
-                    <td>{{ order.quantity }}</td>
+                    <td>
+                        {% for product in ordered_products %}
+                        {{ order.product.product}} {{ order.product.number_of_product }}
+                        {% endfor %}
+                    </td>
                     <td>{{ order.date_of_order }}</td>
                     {% if order.is_ordered == True %}
                     <td>

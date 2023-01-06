@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import ListView, CreateView, DetailView,FormView,View, DeleteView
 from django.contrib.auth.models import User
 from datetime import date, timedelta
-from .models import Contract, Order, Product, Storage, Contractor
-from .forms import ProductForm
+from .models import Contract, Order, Product, OrderProduct, Contractor, QuantifiedProduct
+from .forms import ProductForm, ContractForm
 from django.contrib import messages
 
 def home(request):
@@ -46,7 +47,7 @@ class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
 
 class ContractListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
-    template_name = 'layout/contracts.html'
+    template_name = 'layout/contract_list.html'
     context_object_name = 'contracts'
     def get_queryset(self):
         queryset = Contract.objects.filter(author__profile__company = self.request.user.profile.company)
@@ -85,41 +86,24 @@ class ContractEndListView(CompanyAndLoginRequiredMixin, ListView):
             object.sendMailIfContractEnding()
         return objects
 
-class ContractCreateView(CompanyAndLoginRequiredMixin, CreateView):
-    model = Contract
-    fields = [
-        'name',
-        'contractor',
-        'start_date',
-        'end_date',
-        'products', 
-        'type',
-        'user_responsible'
-    ]
-    def get_form_class(self):
-        user_company = self.request.user.profile.company
-        modelform = super().get_form_class()
-        modelform.base_fields['products'].queryset = Product.objects.filter(author__profile__company = user_company)
-        modelform.base_fields['contractor'].queryset = Contractor.objects.filter(author__profile__company = user_company)
-        modelform.base_fields['user_responsible'].queryset = User.objects.filter(profile__company = user_company)        
-        return modelform
+class ContractCreateView(CompanyAndLoginRequiredMixin, FormView):
+    form_class = ContractForm
+    template_name = 'layout/order_form.html'
+    success_url = "/orders/"
+    def get_form_kwargs(self):
+        kwargs = super(ContractCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user # pass the 'user' in kwargs
+        return kwargs 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        form.save()
+        items = form.cleaned_data['products']
+        created = Contract.objects.last()
+        for item in items:
+            created_product = QuantifiedProduct.objects.create(product = item, number_of_product = 1)
+            created.products.add(created_product)
+            created.save()
         return super().form_valid(form)
-
-class StorageCreateView(CompanyAndLoginRequiredMixin, CreateView):
-    model = Storage
-    fields = [
-        'contract',
-        'product',
-        'number_of_products'
-    ]
-    def get_form_class(self):
-        user_company = self.request.user.profile.company
-        modelform = super().get_form_class()
-        modelform.base_fields['product'].queryset = Product.objects.filter(author__profile__company = user_company)
-        modelform.base_fields['contract'].queryset = Contract.objects.filter(author__profile__company = user_company)
-        return modelform
 
 class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Contractor
@@ -135,19 +119,15 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
     model = Order
     fields = [
         'contract',
-        'quantity',
-        'date_of_order',
-        'is_ordered', 
-        'is_delivered',
-        'date_of_order'
-        ]
+        'ordered_products',
+        'date_of_order']
     def get_form_class(self):
         modelform = super().get_form_class()
         product_name = self.request.GET.get('name')
         if product_name is not None:
             modelform.base_fields['contract'].queryset = Contract.objects.filter(
                 author__profile__company = self.request.user.profile.company).filter(
-                products__name = product_name)
+                products__product__name = product_name)
         else:
             modelform.base_fields['contract'].queryset = Contract.objects.filter(
                 author__profile__company = self.request.user.profile.company)
@@ -155,6 +135,18 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+
+class OrderCartView(View):
+    def get(self, *args, **kwargs):
+        try:
+            order = OrderProduct.objects.get(user=self.request.user)
+            context = {
+                'object': order
+            }
+            return render(self.request, 'order_cart.html', context)
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "You do not have an active order")
+            return redirect("/")
 
 class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product
