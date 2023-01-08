@@ -74,7 +74,7 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     def __str__(self):
-        return f"{self.quantity} of {self.item.title}"         
+        return f"{self.quantity} of {self.product} in {self.contract}"         
 
 class Order(models.Model):
     contract = models.ForeignKey(Contract, null=True, on_delete=models.SET_NULL)

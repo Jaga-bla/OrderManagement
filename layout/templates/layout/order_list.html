@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% block content %}
+{% load static%}
 </div>
 <form class="d-flex" role="search">
     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -10,22 +11,19 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                <th>NO</th>
                 <th>Order</th>
-                <th>Quantity</th>
                 <th>Date Of Order</th>
                 <th>Is ordered</th>
                 <th>Is delivered</th>
                 </tr>
             </thead>
                 {% for order in orders %}
-                    <tr>   
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.contract }}</td>
                     <td>
-                        {% for product in ordered_products %}
-                        {{ order.product.product}} {{ order.product.number_of_product }}
-                        {% endfor %}
+                        {% for product in order.ordered_products.all %}
+                        <div>
+                            {{ product }}
+                        </div>
+                        {% endfor %} 
                     </td>
                     <td>{{ order.date_of_order }}</td>
                     {% if order.is_ordered == True %}
@@ -47,7 +45,9 @@
                     </td>
                     {% endif %}
                     <td>
-                    <a href =  "{% url 'object-delete' order.id %}">Delete</a>
+                        <a href="{% url 'order-delete' order.id %}">
+                            <img src="{% static 'layout/data/recycle-bin-3105.png' %}">
+                        </a>
                     </td>
                 {% endfor %}  
             </tr>

@@ -66,7 +66,6 @@ class LoginCompanyView(FormView):
                 messages.warning(self.request, ('Wrong company key!'))
                 return redirect('login-company') 
 
-
 @login_required
 def profile(request):
     if request.method == 'POST':

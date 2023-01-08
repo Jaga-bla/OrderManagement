@@ -1,7 +1,12 @@
 {% extends "layout/base.html" %}
 {% block content %}
+{% load static %}
 <h2 class="article-title">{{ object.name }}</h2>
-<a href =  "#">Edit</a>
-<a href =  "{% url 'product-delete' product.id %}">Delete</a>
+<a href="{% url 'product-delete' product.id %}">
+    <img src="{% static 'layout/data/settings-3110.png' %}">
+</a>
+<a href="{% url 'product-delete' product.id %}">
+    <img src="{% static 'layout/data/recycle-bin-3105.png' %}">
+</a>
 <p class="article-content">{{ object.description }}</p>
 {% endblock content %}

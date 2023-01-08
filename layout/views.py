@@ -42,8 +42,8 @@ class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.save()
+        messages.success("You've created new Product")
         return super().form_valid(form)
-
 
 class ContractListView(CompanyAndLoginRequiredMixin, ListView):
     model = Contract
@@ -52,6 +52,20 @@ class ContractListView(CompanyAndLoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Contract.objects.filter(author__profile__company = self.request.user.profile.company)
         return queryset
+    def post(self, request, *args, **kwargs):
+        ID_list_ordered = request.POST.getlist('cart')
+        ID_list_ordered = ID_list_ordered[0].split("&")
+        ID_contract = ID_list_ordered[0]
+        ID_product = ID_list_ordered[1]
+        quanity_object = request.POST.get(f"quantity{ID_contract}&{ID_product}")
+        contract_object = Contract.objects.filter(id = ID_list_ordered[0]).first()
+        quantified_product_object = QuantifiedProduct.objects.filter(id = ID_list_ordered[1]).first()
+        OrderProduct.objects.create(
+            user = request.user, 
+            contract=contract_object, 
+            product = quantified_product_object.product, 
+            quantity = quanity_object)
+        return redirect('contracts-list')
 
 class OrderListView(CompanyAndLoginRequiredMixin, ListView):
     model = Order
@@ -79,7 +93,7 @@ class ContractEndListView(CompanyAndLoginRequiredMixin, ListView):
     def get_queryset(self):
         user = User.objects.filter(username=self.request.user).first()
         objects =  Contract.objects.filter(user_responsible=user).filter(
-            type='Public Auction').filter(
+            type='PUBLIC_AUCTION').filter(
                 end_date__lte=date.today()+timedelta(days=180)).filter(
                     end_date__gte=date.today())
         for object in objects:
@@ -103,6 +117,7 @@ class ContractCreateView(CompanyAndLoginRequiredMixin, FormView):
             created_product = QuantifiedProduct.objects.create(product = item, number_of_product = 1)
             created.products.add(created_product)
             created.save()
+        messages.success("You've created new Contract")
         return super().form_valid(form)
 
 class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
@@ -113,6 +128,7 @@ class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
     ]
     def form_valid(self, form):
         form.instance.author = self.request.user
+        messages.success("You've created new Contractor")
         return super().form_valid(form)
 
 class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
@@ -139,11 +155,11 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
 class OrderCartView(View):
     def get(self, *args, **kwargs):
         try:
-            order = OrderProduct.objects.get(user=self.request.user)
+            order = OrderProduct.objects.filter(user=self.request.user)
             context = {
                 'object': order
             }
-            return render(self.request, 'order_cart.html', context)
+            return render(self.request, 'layout/order_cart.html', context)
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
