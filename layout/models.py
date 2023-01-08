@@ -39,6 +39,10 @@ class QuantifiedProduct(models.Model):
     number_of_product = models.PositiveIntegerField(default=1)
     def __str__(self):
         return f"{self.number_of_product} of {self.product}"
+    def setQuantity(self, quantity):
+        self.number_of_product = self.number_of_product + quantity
+        self.save()
+    
 
 class Contract(models.Model):
     name = models.CharField(max_length=100)
@@ -58,8 +62,6 @@ class Contract(models.Model):
         return reverse('storage-create')
     def __str__(self):
         return self.name  
-    def get_products(self):
-        return [product for product in self.products.all()]
     def sendMailIfContractEnding(self):
         subject = "Your contract is ending"
         message = (f"We would like to inform you, that contract {self.name} will expire on {self.end_date}")

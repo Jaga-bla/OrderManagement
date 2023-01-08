@@ -42,7 +42,7 @@ class ProductCreateView(CompanyAndLoginRequiredMixin, FormView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.save()
-        messages.success("You've created new Product")
+        messages.success(self.request, "You've created a new Product")
         return super().form_valid(form)
 
 class ContractListView(CompanyAndLoginRequiredMixin, ListView):
@@ -65,6 +65,7 @@ class ContractListView(CompanyAndLoginRequiredMixin, ListView):
             contract=contract_object, 
             product = quantified_product_object.product, 
             quantity = quanity_object)
+        quantified_product_object.setQuantity(-int(quanity_object))
         return redirect('contracts-list')
 
 class OrderListView(CompanyAndLoginRequiredMixin, ListView):
@@ -103,10 +104,10 @@ class ContractEndListView(CompanyAndLoginRequiredMixin, ListView):
 class ContractCreateView(CompanyAndLoginRequiredMixin, FormView):
     form_class = ContractForm
     template_name = 'layout/order_form.html'
-    success_url = "/orders/"
+    success_url = "/contracts/"
     def get_form_kwargs(self):
         kwargs = super(ContractCreateView, self).get_form_kwargs()
-        kwargs['user'] = self.request.user # pass the 'user' in kwargs
+        kwargs['user'] = self.request.user 
         return kwargs 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -117,7 +118,7 @@ class ContractCreateView(CompanyAndLoginRequiredMixin, FormView):
             created_product = QuantifiedProduct.objects.create(product = item, number_of_product = 1)
             created.products.add(created_product)
             created.save()
-        messages.success("You've created new Contract")
+        messages.success(self.request,"You've created new Contract")
         return super().form_valid(form)
 
 class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
@@ -128,7 +129,7 @@ class ContractorCreateView(CompanyAndLoginRequiredMixin, CreateView):
     ]
     def form_valid(self, form):
         form.instance.author = self.request.user
-        messages.success("You've created new Contractor")
+        messages.success(self.request,"You've created new Contractor")
         return super().form_valid(form)
 
 class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
@@ -154,15 +155,43 @@ class OrderCreateView(CompanyAndLoginRequiredMixin, CreateView):
 
 class OrderCartView(View):
     def get(self, *args, **kwargs):
-        try:
-            order = OrderProduct.objects.filter(user=self.request.user)
+        order = OrderProduct.objects.filter(user=self.request.user)
+        if order:
             context = {
                 'object': order
             }
             return render(self.request, 'layout/order_cart.html', context)
-        except ObjectDoesNotExist:
+        else:
             messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+            return redirect("contracts-list")
+    def post(self, request, *args, **kwargs):
+        action_and_ID = request.POST.get('cart')
+        action_and_ID = action_and_ID.split("&")
+        order_product = OrderProduct.objects.filter(id=int(action_and_ID[1])).first()
+        contact_to_change_quantity = Contract.objects.filter(id = order_product.contract.id).first()
+        products_to_changequantity = contact_to_change_quantity.products.all()
+        if action_and_ID[0] == 'minus':
+            order_product.quantity = order_product.quantity -1
+            order_product.save()
+            for product in products_to_changequantity:
+                if product.product == order_product.product:
+                    product.number_of_product = product.number_of_product + 1
+                    product.save()
+        if action_and_ID[0] == 'plus':
+            order_product.quantity = order_product.quantity+1
+            order_product.save()
+            for product in products_to_changequantity:
+                if product.product == order_product.product:
+                    product.number_of_product = product.number_of_product - 1
+                    product.save()
+        if action_and_ID[0] == 'delete':
+            for product in products_to_changequantity:
+                if product.product == order_product.product:
+                    product.number_of_product = product.number_of_product + order_product.quantity
+                    product.save()
+            order_product.delete()
+
+        return redirect('order-cart')
 
 class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product

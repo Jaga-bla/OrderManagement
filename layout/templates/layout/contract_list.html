@@ -4,6 +4,7 @@
 </div>
 <form class="d-flex" role="search">
     <input class="form-control me-2" type="search" placeholder="Search by contract" id="myInputContract" onkeyup="filter()">
+    <input class="form-control me-2" type="search" placeholder="Search by contractor" id="myInputContractor" onkeyup="filter()">
     <input class="form-control me-2" type="search" placeholder="Search by product" id="myInputProduct" onkeyup="filter()">
     <input class="form-control me-2" type="search" placeholder="Search by user responsible" id="myInputUserResponsible" onkeyup="filter()">
 </form>
@@ -13,6 +14,7 @@
         <thead>
             <tr>
                 <th scope="col">Contract</th>
+                <th scope="col">Contractor</th>
                 <th scope="col">Products</th>
                 <th scope="col">Start Date</th>
                 <th scope="col">End Date</th>
@@ -24,14 +26,19 @@
                 <tr>
                 
                 <td>{{ contract.name}}</td>
+                <td>{{ contract.contractor }}</td>
                 <td>
                     {% for contract_product in contract.products.all %}
-                    <div>
-                        <a href="#">{{ contract_product.product }}</a> - {{ contract_product.number_of_product }}
-                        <input name="quantity{{contract.id}}&{{contract_product.id}}" type="number" id="tentacles" name="tentacles" min="0" max="100">
-                        <button type="button" class="btn btn-link" name="cart" value = "{{contract.id}}&{{contract_product.id}}">
-                            <img src="{% static 'layout/data/add-to-cart-3046.png' %}">
-                        </button>
+                    <div style="width: 100%; overflow: hidden;">
+                        <div style="width: 100px; margin-right: 10px; float: left;">
+                            <a href="#">{{ contract_product.product }}</a> - {{ contract_product.number_of_product }}
+                        </div>
+                        <div style="margin-left: 50px;">
+                            <input name="quantity{{contract.id}}&{{contract_product.id}}" type="number" id="tentacles" name="tentacles" min="0" max="100">
+                            <button name="cart" value = "{{contract.id}}&{{contract_product.id}}">
+                                <img src="{% static 'layout/data/add-to-cart-3046.png' %}">
+                            </button>
+                        </div>
                     </div>
                     {% endfor %} 
                 </td>
@@ -62,19 +69,25 @@
         filter_producer = input_producer.value.toUpperCase();
         input_catNo = document.getElementById("myInputUserResponsible");
         filter_catNo = input_catNo.value.toUpperCase();
+        input_contractor = document.getElementById("myInputContractor");
+        filter_contractor = input_contractor.value.toUpperCase();
         table = document.getElementById("myTable");
         tr = table.getElementsByTagName("tr");
         for (i = 0; i < tr.length; i++) {
         td_first = tr[i].getElementsByTagName("td")[0];
-        td_second = tr[i].getElementsByTagName("td")[1];
-        td_third = tr[i].getElementsByTagName("td")[5];
-        if (td_first || td_second || td_third) {
+        td_fourth = tr[i].getElementsByTagName("td")[1];
+        td_second = tr[i].getElementsByTagName("td")[2];
+        td_third = tr[i].getElementsByTagName("td")[6];
+        if (td_first || td_second || td_third || td_fourth) {
             txtValue1 = td_first.textContent || td_first.innerText;
             txtValue2 = td_second.textContent || td_first.innerText;
             txtValue3 = td_third.textContent || td_first.innerText;
+            txtValue4 = td_fourth.textContent || td_fourth.innerText;
             if (txtValue1.toUpperCase().indexOf(filter_product) > -1 && 
                 txtValue2.toUpperCase().indexOf(filter_producer) > -1  && 
-                txtValue3.toUpperCase().indexOf(filter_catNo) > -1) {
+                txtValue3.toUpperCase().indexOf(filter_catNo) > -1 &&
+                txtValue4.toUpperCase().indexOf(filter_contractor) > -1
+                ) {
             tr[i].style.display = "";
             } else {
             tr[i].style.display = "none";
