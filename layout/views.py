@@ -1,6 +1,4 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import ListView, CreateView, DetailView,FormView,View, DeleteView
 from django.contrib.auth.models import User
 from datetime import date, timedelta
@@ -28,7 +26,7 @@ class ProductListView(CompanyAndLoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Product.objects.filter(author__profile__company = self.request.user.profile.company)
         return queryset
-    def post(self, request, *args, **kwargs):
+    def post(self, *args, **kwargs):
         products = Product.objects.filter()
         for product in products:
             if self.request.POST.get("myButton"+str(product.name)):
@@ -52,21 +50,31 @@ class ContractListView(CompanyAndLoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Contract.objects.filter(author__profile__company = self.request.user.profile.company)
         return queryset
-    def post(self, request, *args, **kwargs):
-        ID_list_ordered = request.POST.getlist('cart')
-        ID_list_ordered = ID_list_ordered[0].split("&")
-        ID_contract = ID_list_ordered[0]
-        ID_product = ID_list_ordered[1]
-        quanity_object = request.POST.get(f"quantity{ID_contract}&{ID_product}")
-        contract_object = Contract.objects.filter(id = ID_list_ordered[0]).first()
-        quantified_product_object = QuantifiedProduct.objects.filter(id = ID_list_ordered[1]).first()
-        OrderProduct.objects.create(
-            user = request.user, 
-            contract=contract_object, 
-            product = quantified_product_object.product, 
-            quantity = quanity_object)
-        quantified_product_object.setQuantity(-int(quanity_object))
+    def post(self, *args, **kwargs):
+        try:
+            ID_contract, ID_product, order_product_quantity = self.get_IDs_and_quantity()
+            quantified_product = self.get_quantified_product(ID_product)
+            quantified_product.changeQuantity(-int(order_product_quantity))
+            OrderProduct.objects.create(
+                user = self.request.user, 
+                contract= self.get_contract(ID_contract), 
+                product = quantified_product.product, 
+                quantity = order_product_quantity)
+        except:
+            messages.warning(self.request, "You can't order more products than currenty in contract")
         return redirect('contracts-list')
+
+    def get_IDs_and_quantity(self):
+        ID_cart_list = self.request.POST.getlist('cart')
+        ID_cart_list = ID_cart_list[0].split("&")
+        ID_contract= ID_cart_list[0]
+        ID_product = ID_cart_list [1]
+        object_quantity = self.request.POST.get(f"quantity{ID_contract}&{ID_product}")
+        return ID_contract, ID_product, object_quantity
+    def get_contract(self, ID_contract):
+        return Contract.objects.filter(id = ID_contract).first()
+    def get_quantified_product(self, ID_product):
+        return QuantifiedProduct.objects.filter(id = ID_product).first()
 
 class OrderListView(CompanyAndLoginRequiredMixin, ListView):
     model = Order
@@ -164,34 +172,41 @@ class OrderCartView(View):
         else:
             messages.warning(self.request, "You do not have an active order")
             return redirect("contracts-list")
-    def post(self, request, *args, **kwargs):
-        action_and_ID = request.POST.get('cart')
-        action_and_ID = action_and_ID.split("&")
-        order_product = OrderProduct.objects.filter(id=int(action_and_ID[1])).first()
+    def post(self, *args, **kwargs):
+        action, order_product_ID = self.get_action_and_order_product_ID()
+        order_product = OrderProduct.objects.filter(id=order_product_ID).first()
         contact_to_change_quantity = Contract.objects.filter(id = order_product.contract.id).first()
-        products_to_changequantity = contact_to_change_quantity.products.all()
-        if action_and_ID[0] == 'minus':
-            order_product.quantity = order_product.quantity -1
-            order_product.save()
-            for product in products_to_changequantity:
+        contract_products_to_change_quantity = contact_to_change_quantity.products.all()
+        if action == 'minus':
+            if order_product.quantity >1:
+                order_product.quantity = order_product.quantity -1
+                order_product.save()
+                for product in contract_products_to_change_quantity:
+                    if product.product == order_product.product:
+                        product.changeQuantity(1)
+            else:
+                messages.warning(self.request, "You can't order 0 or less, delete order")
+        if action == 'plus':
+            for product in contract_products_to_change_quantity:
                 if product.product == order_product.product:
-                    product.number_of_product = product.number_of_product + 1
-                    product.save()
-        if action_and_ID[0] == 'plus':
-            order_product.quantity = order_product.quantity+1
-            order_product.save()
-            for product in products_to_changequantity:
+                    try:
+                        product.changeQuantity(-1)
+                        order_product.quantity = order_product.quantity+1
+                        order_product.save()
+                    except:
+                        messages.warning(self.request, "No more items in contract!")
+        if action == 'delete':
+            for product in contract_products_to_change_quantity:
                 if product.product == order_product.product:
-                    product.number_of_product = product.number_of_product - 1
-                    product.save()
-        if action_and_ID[0] == 'delete':
-            for product in products_to_changequantity:
-                if product.product == order_product.product:
-                    product.number_of_product = product.number_of_product + order_product.quantity
-                    product.save()
+                    product.changeQuantity(order_product.quantity)
             order_product.delete()
-
         return redirect('order-cart')
+    def get_action_and_order_product_ID(self):
+        action_and_ID = self.request.POST.get('cart')
+        action_and_ID = action_and_ID.split("&")
+        action = action_and_ID[0]
+        order_product_ID = int(action_and_ID[1])
+        return action, order_product_ID
 
 class ProductDetailView(CompanyAndLoginRequiredMixin, DetailView):
     model = Product

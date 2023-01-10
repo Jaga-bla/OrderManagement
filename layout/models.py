@@ -39,9 +39,12 @@ class QuantifiedProduct(models.Model):
     number_of_product = models.PositiveIntegerField(default=1)
     def __str__(self):
         return f"{self.number_of_product} of {self.product}"
-    def setQuantity(self, quantity):
-        self.number_of_product = self.number_of_product + quantity
-        self.save()
+    def changeQuantity(self, quantity):
+        if quantity < 0 and self.number_of_product <= 0:
+            raise Exception("Can't substract from 0 products")
+        else:
+            self.number_of_product = self.number_of_product + quantity
+            self.save()
     
 
 class Contract(models.Model):

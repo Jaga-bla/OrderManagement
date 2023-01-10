@@ -13,7 +13,6 @@
     </thead>
         {% for order in object %}
             <tr>
-            <td>{{ order.id}}</td>
             <td>{{ order.contract}}</td>
             <td>{{ order.product}}</td>
             <td>{{ order.quantity}}</td>
@@ -31,7 +30,7 @@
         {% endfor %}  
     </tr>
 </table>
-<button name="cart" value = "submit">
+<button name="order&" value = "submit">
     Create an Order
 </button>
 </form>
